@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 
 export default function HomePage() {
   const [users, setUsers] = useState([])
@@ -102,7 +101,7 @@ export default function HomePage() {
             <div className="p-6 text-center text-gray-500">Yükleniyor...</div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {users.map((user: any) => (
+              {users.map((user: {id: number, adSoyad: string, pozisyon: string, departman: string, email: string}) => (
                 <div key={user.id} className="px-6 py-4 flex items-center space-x-4">
                   <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
                     {user.adSoyad.split(' ').map((n: string) => n[0]).join('')}

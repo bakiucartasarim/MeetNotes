@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     // Sorumlu kişileri ekle
     if (data.sorumluKisiler && data.sorumluKisiler.length > 0) {
       await prisma.aksiyonSorumluKisi.createMany({
-        data: data.sorumluKisiler.map((sorumlu: any) => ({
+        data: data.sorumluKisiler.map((sorumlu: {kullaniciId: string, rol?: string}) => ({
           aksiyonId: action.id,
           kullaniciId: parseInt(sorumlu.kullaniciId),
           rol: sorumlu.rol || 'Sorumlu'
