@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Kullanici {
+  id                    Int                     @id @default(autoincrement())
+  adSoyad               String                  @map("ad_soyad")
+  email                 String                  @unique
+  telefon               String?
+  departman             String?
+  pozisyon              String?
+  aktif                 Boolean                 @default(true)
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  olusturduguToplantilar Toplanti[]            @relation("ToplantiOlusturan")
+  katilimlar            ToplantiKatilimci[]
+  sorumluOlduguAksiyonlar AksiyonSorumluKisi[]
+
+  @@map("kullanicilar")
+}
+
+model Toplanti {
+  id               Int                 @id @default(autoincrement())
+  baslik           String
+  aciklama         String?
+  tarih            DateTime            @db.Date
+  saat             DateTime            @db.Time
+  sure             Int                 @default(60) // Dakika cinsinden
+  olusturanId      Int                 @map("olusturan_id")
+  olusturmaTarihi  DateTime            @default(now()) @map("olusturma_tarihi")
+  guncellemeTarihi DateTime            @default(now()) @updatedAt @map("guncelleme_tarihi")
+  durum            ToplantiDurum       @default(aktif)
+  konum            String?
+  onlineLink       String?             @map("online_link")
+
+  // Relations
+  olusturan        Kullanici           @relation("ToplantiOlusturan", fields: [olusturanId], references: [id], onDelete: Cascade)
+  katilimcilar     ToplantiKatilimci[]
+  aksiyonlar       ToplantiAksiyon[]
+
+  @@map("toplantilar")
+}
+
+model ToplantiKatilimci {
+  id             Int                    @id @default(autoincrement())
+  toplantiId     Int                    @map("toplanti_id")
+  kullaniciId    Int                    @map("kullanici_id")
+  katilimDurumu  KatilimDurum          @default(beklemede) @map("katilim_durumu")
+  davetTarihi    DateTime               @default(now()) @map("davet_tarihi")
+  cevapTarihi    DateTime?              @map("cevap_tarihi")
+  notlar         String?
+
+  // Relations
+  toplanti       Toplanti               @relation(fields: [toplantiId], references: [id], onDelete: Cascade)
+  kullanici      Kullanici              @relation(fields: [kullaniciId], references: [id], onDelete: Cascade)
+
+  @@unique([toplantiId, kullaniciId])
+  @@map("toplanti_katilimcilari")
+}
+
+model ToplantiAksiyon {
+  id             Int                    @id @default(autoincrement())
+  toplantiId     Int                    @map("toplanti_id")
+  baslik         String
+  aciklama       String?
+  durum          AksiyonDurum           @default(beklemede)
+  baslangicTarihi DateTime?             @map("baslangic_tarihi") @db.Date
+  bitisTarihi    DateTime?              @map("bitis_tarihi") @db.Date
+  oncelik        AksiyonOncelik         @default(orta)
+  olusturmaTarihi DateTime              @default(now()) @map("olusturma_tarihi")
+
+  // Relations
+  toplanti       Toplanti               @relation(fields: [toplantiId], references: [id], onDelete: Cascade)
+  sorumluKisiler AksiyonSorumluKisi[]
+
+  @@map("toplanti_aksiyonlari")
+}
+
+model AksiyonSorumluKisi {
+  id           Int           @id @default(autoincrement())
+  aksiyonId    Int           @map("aksiyon_id")
+  kullaniciId  Int           @map("kullanici_id")
+  rol          String
+  onaylandi    Boolean       @default(false)
+  onayTarihi   DateTime?     @map("onay_tarihi")
+  yorum        String?
+
+  // Relations
+  aksiyon      ToplantiAksiyon @relation(fields: [aksiyonId], references: [id], onDelete: Cascade)
+  kullanici    Kullanici       @relation(fields: [kullaniciId], references: [id], onDelete: Cascade)
+
+  @@map("aksiyon_sorumlu_kişiler")
+}
+
+// Enums
+enum ToplantiDurum {
+  aktif
+  iptal
+  tamamlandi
+}
+
+enum KatilimDurum {
+  beklemede
+  kabul
+  red
+  katildi
+  katilmadi
+}
+
+enum AksiyonDurum {
+  beklemede
+  devam_ediyor
+  tamamlandi
+  iptal
+}
+
+enum AksiyonOncelik {
+  dusuk
+  orta
+  yuksek
+  kritik
+}
