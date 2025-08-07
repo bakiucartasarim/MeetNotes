@@ -51,12 +51,36 @@ export default function MeetingsPage() {
   }, [isAuthenticated, authLoading])
 
   useEffect(() => {
-    fetchMeetings()
-  }, [])
+    if (user) {
+      fetchMeetings()
+    }
+  }, [user])
 
   const fetchMeetings = async () => {
+    if (!user?.id) return
+
     try {
-      // Demo data - gerçek API'de /api/meetings?kullanici_id=${currentUser.id} kullanılacak
+      // Try real API first
+      try {
+        const response = await fetch(`/api/meetings?kullanici_id=${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success) {
+            setMeetings(data.data)
+            setLoading(false)
+            return
+          }
+        }
+      } catch (apiError) {
+        console.log('API not available, using demo data')
+      }
+
+      // Fallback to demo data filtered by current user
       const demoMeetings: Meeting[] = [
         {
           id: 1,
@@ -93,10 +117,54 @@ export default function MeetingsPage() {
           aksiyonlar: [
             { id: 3, baslik: 'Anket sonuçlarının analizi', durum: 'tamamlandi' }
           ]
+        },
+        {
+          id: 3,
+          baslik: 'Fatma\'nın Katıldığı Toplantı',
+          aciklama: 'Fatma katılımcı olarak davet edilmiş',
+          tarih: '2025-08-15',
+          saat: '09:00',
+          sure: 60,
+          durum: 'aktif',
+          konum: 'Toplantı Salonu B',
+          olusturan: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
+          katilimcilar: [
+            { id: 4, katilimDurumu: 'beklemede', kullanici: { id: 2, adSoyad: 'Fatma Kaya', email: 'fatma@workcube.com', departman: 'IT', pozisyon: 'Developer' } }
+          ],
+          aksiyonlar: []
+        },
+        {
+          id: 4,
+          baslik: 'Ayşe\'nin Aksiyon Sorumlusu Olduğu Toplantı',
+          aciklama: 'Ayşe bir aksiyondan sorumlu',
+          tarih: '2025-08-20',
+          saat: '15:00',
+          sure: 45,
+          durum: 'aktif',
+          onlineLink: 'https://zoom.us/j/123456789',
+          olusturan: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
+          katilimcilar: [],
+          aksiyonlar: [
+            { id: 4, baslik: 'QA testleri hazırlama', durum: 'beklemede' }
+          ]
         }
       ]
       
-      setMeetings(demoMeetings)
+      // Filter demo data by current user (simulating the API logic)
+      const userMeetings = demoMeetings.filter(meeting => {
+        // 1. User is creator
+        if (meeting.olusturan.id === user.id) return true
+        
+        // 2. User is participant  
+        if (meeting.katilimcilar.some(k => k.kullanici.id === user.id)) return true
+        
+        // 3. User is responsible for any action (simulated - in real API this would be checked)
+        if (user.id === 3 && meeting.id === 4) return true // Ayşe (id:3) for meeting 4
+        
+        return false
+      })
+      
+      setMeetings(userMeetings)
     } catch (error) {
       console.error('Meetings fetch error:', error)
     } finally {

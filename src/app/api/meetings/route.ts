@@ -16,10 +16,22 @@ export async function GET(request: NextRequest) {
     const meetings = await prisma.toplanti.findMany({
       where: {
         OR: [
+          // 1. Toplantıyı oluşturan
           { olusturanId: parseInt(kullaniciId) },
+          // 2. Toplantıya katılımcı olarak davet edilen
           { 
             katilimcilar: {
               some: { kullaniciId: parseInt(kullaniciId) }
+            }
+          },
+          // 3. Toplantının herhangi bir aksiyonunda sorumlu kişi olan
+          {
+            aksiyonlar: {
+              some: {
+                sorumluKisiler: {
+                  some: { kullaniciId: parseInt(kullaniciId) }
+                }
+              }
             }
           }
         ]
