@@ -1,14 +1,22 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      console.log('User already authenticated, redirecting to meetings')
+      window.location.href = '/meetings'
+    }
+  }, [isAuthenticated, authLoading])
   const [form, setForm] = useState({
     email: '',
     sifre: ''
@@ -47,11 +55,11 @@ export default function LoginPage() {
         // Also set cookie for middleware
         document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}` // 7 days
         
-        // Show success message
-        alert(`${data.message}\nHoş geldiniz ${data.user.adSoyad}!`)
+        // Immediate redirect without alert
+        console.log(`${data.message} - Hoş geldiniz ${data.user.adSoyad}!`)
         
-        // Redirect to meetings page
-        router.push('/meetings')
+        // Use window.location for immediate redirect
+        window.location.href = '/meetings'
       } else {
         setError(data.error || 'Giriş yapılırken hata oluştu')
       }

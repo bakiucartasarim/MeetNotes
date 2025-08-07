@@ -45,9 +45,10 @@ export default function MeetingsPage() {
   // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
-      router.push('/login')
+      console.log('User not authenticated, redirecting to login')
+      window.location.href = '/login'
     }
-  }, [isAuthenticated, authLoading, router])
+  }, [isAuthenticated, authLoading])
 
   useEffect(() => {
     fetchMeetings()
