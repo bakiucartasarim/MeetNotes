@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 export default function HomePage() {
   const [users, setUsers] = useState([])
@@ -59,7 +60,7 @@ export default function HomePage() {
 
         {/* Quick Actions */}
         <div className="flex justify-center space-x-4 mb-16">
-          <a 
+          <Link 
             href="/meetings" 
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm"
           >
@@ -67,8 +68,8 @@ export default function HomePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-4 8V9" />
             </svg>
             <span>Toplantılarım</span>
-          </a>
-          <a 
+          </Link>
+          <Link 
             href="/meetings/new" 
             className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm"
           >
@@ -76,7 +77,7 @@ export default function HomePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             <span>Yeni Toplantı</span>
-          </a>
+          </Link>
         </div>
 
         {/* Features Grid */}
