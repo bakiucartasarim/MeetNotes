@@ -11,10 +11,13 @@ model Kullanici {
   id                    Int                     @id @default(autoincrement())
   adSoyad               String                  @map("ad_soyad")
   email                 String                  @unique
+  sifre                 String                  // Hashed password
   telefon               String?
   departman             String?
   pozisyon              String?
   aktif                 Boolean                 @default(true)
+  emailOnaylandi        Boolean                 @default(false) @map("email_onaylandi")
+  sonGirisTarihi        DateTime?               @map("son_giris_tarihi")
   createdAt             DateTime                @default(now()) @map("created_at")
   updatedAt             DateTime                @default(now()) @updatedAt @map("updated_at")
   
