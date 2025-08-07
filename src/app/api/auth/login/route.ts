@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           message: 'Giriş başarılı'
         })
       }
-    } catch (dbError) {
+    } catch {
       console.log('Database not available, using demo mode')
     }
 

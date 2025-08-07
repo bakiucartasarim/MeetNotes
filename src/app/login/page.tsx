@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
-  const router = useRouter()
+  // const router = useRouter() // Will be used for future features
   const { login, isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
 

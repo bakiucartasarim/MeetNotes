@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -50,13 +50,7 @@ export default function MeetingsPage() {
     }
   }, [isAuthenticated, authLoading])
 
-  useEffect(() => {
-    if (user) {
-      fetchMeetings()
-    }
-  }, [user])
-
-  const fetchMeetings = async () => {
+  const fetchMeetings = useCallback(async () => {
     if (!user?.id) return
 
     try {
@@ -84,7 +78,13 @@ export default function MeetingsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    if (user) {
+      fetchMeetings()
+    }
+  }, [user, fetchMeetings])
 
   const getStatusColor = (status: string) => {
     switch (status) {

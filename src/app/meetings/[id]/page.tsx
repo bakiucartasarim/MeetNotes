@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface User {
@@ -56,7 +57,7 @@ interface Meeting {
 
 export default function MeetingDetailPage() {
   const params = useParams()
-  const router = useRouter()
+  // const router = useRouter() // Will be used for future features
   const meetingId = params.id as string
   const { user, isAuthenticated, loading: authLoading } = useAuth()
   

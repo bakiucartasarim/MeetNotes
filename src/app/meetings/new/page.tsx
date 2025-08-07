@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface User {
@@ -25,7 +25,7 @@ interface MeetingForm {
 }
 
 export default function NewMeetingPage() {
-  const router = useRouter()
+  // const router = useRouter() // Will be used for future features
   const { user, isAuthenticated, loading: authLoading } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
