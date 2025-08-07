@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface User {
   id: number
@@ -55,14 +56,22 @@ interface Meeting {
 
 export default function MeetingDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const meetingId = params.id as string
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   
   const [meeting, setMeeting] = useState<Meeting | null>(null)
   const [loading, setLoading] = useState(true)
   const [newActionModal, setNewActionModal] = useState(false)
   const [commentModal, setCommentModal] = useState<{actionId: number, responsibleId: number} | null>(null)
   const [comment, setComment] = useState('')
-  // const [currentUser] = useState({ id: 1, adSoyad: 'Demo Kullanıcı' })
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      window.location.href = '/login'
+    }
+  }, [isAuthenticated, authLoading])
 
   // New Action Form
   const [newAction, setNewAction] = useState({
@@ -75,154 +84,288 @@ export default function MeetingDetailPage() {
   })
 
   const fetchMeetingDetail = useCallback(async () => {
+    if (!user?.id || !meetingId) return
+
     try {
-      // Demo data - gerçek API'de /api/meetings/${meetingId} kullanılacak
-      const demoMeeting: Meeting = {
-        id: parseInt(meetingId),
-        baslik: 'Haftalık Proje Değerlendirmesi',
-        aciklama: 'Sprint sonucu ve gelecek hafta planlaması. Bu toplantıda tamamlanan taskları değerlendirip, gelecek sprint için planlama yapacağız.',
-        tarih: '2025-08-10',
-        saat: '14:00',
-        sure: 90,
-        durum: 'aktif',
-        konum: 'Toplantı Salonu A',
-        onlineLink: 'https://meet.google.com/abc-def-ghi',
-        olusturan: { 
-          id: 1, 
-          adSoyad: 'Ahmet Yılmaz', 
-          email: 'ahmet@workcube.com', 
-          departman: 'IT', 
-          pozisyon: 'Proje Yöneticisi' 
-        },
-        katilimcilar: [
-          { 
-            id: 1, 
-            katilimDurumu: 'kabul', 
-            kullanici: { 
-              id: 2, 
-              adSoyad: 'Fatma Kaya', 
-              email: 'fatma@workcube.com', 
-              departman: 'IT', 
-              pozisyon: 'Backend Developer' 
-            } 
-          },
-          { 
-            id: 2, 
-            katilimDurumu: 'kabul', 
-            kullanici: { 
-              id: 3, 
-              adSoyad: 'Mehmet Öz', 
-              email: 'mehmet@workcube.com', 
-              departman: 'IT', 
-              pozisyon: 'Frontend Developer' 
-            } 
-          },
-          { 
-            id: 3, 
-            katilimDurumu: 'beklemede', 
-            kullanici: { 
-              id: 4, 
-              adSoyad: 'Ayşe Demir', 
-              email: 'ayse@workcube.com', 
-              departman: 'QA', 
-              pozisyon: 'QA Engineer' 
-            } 
+      // Try real API first
+      try {
+        const response = await fetch(`/api/meetings/${meetingId}?kullanici_id=${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        ],
-        aksiyonlar: [
-          {
-            id: 1,
-            baslik: 'API Dokümantasyonu Güncellemesi',
-            aciklama: 'Yeni endpoint\'lerin dokümantasyonunu hazırla ve mevcut dökümanları güncelle',
-            durum: 'devam_ediyor',
-            baslangicTarihi: '2025-08-08',
-            bitisTarihi: '2025-08-15',
-            oncelik: 'yuksek',
-            olusturmaTarihi: '2025-08-07T10:00:00Z',
-            sorumluKisiler: [
-              {
-                id: 1,
-                kullaniciId: 2,
-                rol: 'Backend Developer',
-                onaylandi: true,
-                onayTarihi: '2025-08-08T09:30:00Z',
-                yorum: 'API dokümantasyonu hazır, endpoint listesi tamamlandı.',
-                kullanici: { 
-                  id: 2, 
-                  adSoyad: 'Fatma Kaya', 
-                  email: 'fatma@workcube.com', 
-                  departman: 'IT', 
-                  pozisyon: 'Backend Developer' 
-                }
-              },
-              {
-                id: 2,
-                kullaniciId: 3,
-                rol: 'Frontend Developer',
-                onaylandi: false,
-                onayTarihi: null,
-                yorum: null,
-                kullanici: { 
-                  id: 3, 
-                  adSoyad: 'Mehmet Öz', 
-                  email: 'mehmet@workcube.com', 
-                  departman: 'IT', 
-                  pozisyon: 'Frontend Developer' 
-                }
-              }
-            ]
-          },
-          {
-            id: 2,
-            baslik: 'Test Senaryoları Yazılması',
-            aciklama: 'Yeni özellikler için kapsamlı test senaryoları hazırla',
-            durum: 'beklemede',
-            baslangicTarihi: '2025-08-12',
-            bitisTarihi: '2025-08-20',
-            oncelik: 'orta',
-            olusturmaTarihi: '2025-08-07T10:00:00Z',
-            sorumluKisiler: [
-              {
-                id: 3,
-                kullaniciId: 4,
-                rol: 'QA Engineer',
-                onaylandi: false,
-                onayTarihi: null,
-                yorum: null,
-                kullanici: { 
-                  id: 4, 
-                  adSoyad: 'Ayşe Demir', 
-                  email: 'ayse@workcube.com', 
-                  departman: 'QA', 
-                  pozisyon: 'QA Engineer' 
-                }
-              },
-              {
-                id: 4,
-                kullaniciId: 2,
-                rol: 'Teknik Destek',
-                onaylandi: false,
-                onayTarihi: null,
-                yorum: null,
-                kullanici: { 
-                  id: 2, 
-                  adSoyad: 'Fatma Kaya', 
-                  email: 'fatma@workcube.com', 
-                  departman: 'IT', 
-                  pozisyon: 'Backend Developer' 
-                }
-              }
-            ]
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success) {
+            setMeeting(data.data)
+            setLoading(false)
+            return
           }
-        ]
+        }
+      } catch (apiError) {
+        console.log('API not available, using demo data')
       }
-      setMeeting(demoMeeting)
+
+      // Demo data - multiple meetings based on ID and user
+      const demoMeetings: { [key: string]: Meeting } = {
+        '1': {
+          id: 1,
+          baslik: 'Ahmet\'nin Haftalık Proje Toplantısı',
+          aciklama: 'Sprint sonucu ve gelecek hafta planlaması. Bu toplantıda tamamlanan taskları değerlendirip, gelecek sprint için planlama yapacağız.',
+          tarih: '2025-08-10',
+          saat: '14:00',
+          sure: 90,
+          durum: 'aktif',
+          konum: 'Toplantı Salonu A',
+          onlineLink: 'https://meet.google.com/abc-def-ghi',
+          olusturan: { 
+            id: 1, 
+            adSoyad: 'Ahmet Yılmaz', 
+            email: 'ahmet@workcube.com', 
+            departman: 'IT', 
+            pozisyon: 'Proje Yöneticisi' 
+          },
+          katilimcilar: [
+            { 
+              id: 1, 
+              katilimDurumu: 'kabul', 
+              kullanici: { 
+                id: 2, 
+                adSoyad: 'Fatma Kaya', 
+                email: 'fatma@workcube.com', 
+                departman: 'IT', 
+                pozisyon: 'Backend Developer' 
+              } 
+            }
+          ],
+          aksiyonlar: [
+            {
+              id: 1,
+              baslik: 'API Dokümantasyonu Güncellemesi',
+              aciklama: 'Yeni endpoint\'lerin dokümantasyonunu hazırla',
+              durum: 'devam_ediyor',
+              baslangicTarihi: '2025-08-08',
+              bitisTarihi: '2025-08-15',
+              oncelik: 'yuksek',
+              olusturmaTarihi: '2025-08-07T10:00:00Z',
+              sorumluKisiler: [
+                {
+                  id: 1,
+                  kullaniciId: 2,
+                  rol: 'Backend Developer',
+                  onaylandi: true,
+                  onayTarihi: '2025-08-08T09:30:00Z',
+                  yorum: 'API dokümantasyonu hazır!',
+                  kullanici: { 
+                    id: 2, 
+                    adSoyad: 'Fatma Kaya', 
+                    email: 'fatma@workcube.com', 
+                    departman: 'IT', 
+                    pozisyon: 'Backend Developer' 
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        '2': {
+          id: 2,
+          baslik: 'Müşteri Geri Bildirim Toplantısı',
+          aciklama: 'Q4 müşteri memnuniyet anketleri değerlendirmesi',
+          tarih: '2025-08-12',
+          saat: '10:30',
+          sure: 60,
+          durum: 'aktif',
+          onlineLink: 'https://meet.google.com/abc-def-ghi',
+          olusturan: { 
+            id: 2, 
+            adSoyad: 'Ayşe Demir', 
+            email: 'ayse@workcube.com', 
+            departman: 'Pazarlama', 
+            pozisyon: 'Pazarlama Müdürü' 
+          },
+          katilimcilar: [
+            { 
+              id: 1, 
+              katilimDurumu: 'kabul', 
+              kullanici: { 
+                id: 1, 
+                adSoyad: 'Ahmet Yılmaz', 
+                email: 'ahmet@workcube.com', 
+                departman: 'IT', 
+                pozisyon: 'Proje Yöneticisi' 
+              } 
+            }
+          ],
+          aksiyonlar: [
+            {
+              id: 2,
+              baslik: 'Anket Sonuçlarının Analizi',
+              aciklama: 'Q4 müşteri anket verilerini analiz et',
+              durum: 'tamamlandi',
+              baslangicTarihi: '2025-08-05',
+              bitisTarihi: '2025-08-10',
+              oncelik: 'orta',
+              olusturmaTarihi: '2025-08-05T10:00:00Z',
+              sorumluKisiler: [
+                {
+                  id: 2,
+                  kullaniciId: 1,
+                  rol: 'Proje Yöneticisi',
+                  onaylandi: true,
+                  onayTarihi: '2025-08-10T14:00:00Z',
+                  yorum: 'Analiz tamamlandı, rapor hazır.',
+                  kullanici: { 
+                    id: 1, 
+                    adSoyad: 'Ahmet Yılmaz', 
+                    email: 'ahmet@workcube.com', 
+                    departman: 'IT', 
+                    pozisyon: 'Proje Yöneticisi' 
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        '3': {
+          id: 3,
+          baslik: 'Fatma\'nın Katıldığı Toplantı',
+          aciklama: 'Teknik altyapı değerlendirmesi',
+          tarih: '2025-08-15',
+          saat: '09:00',
+          sure: 60,
+          durum: 'aktif',
+          konum: 'Toplantı Salonu B',
+          olusturan: { 
+            id: 1, 
+            adSoyad: 'Ahmet Yılmaz', 
+            email: 'ahmet@workcube.com', 
+            departman: 'IT', 
+            pozisyon: 'Proje Yöneticisi' 
+          },
+          katilimcilar: [
+            { 
+              id: 1, 
+              katilimDurumu: 'beklemede', 
+              kullanici: { 
+                id: 2, 
+                adSoyad: 'Fatma Kaya', 
+                email: 'fatma@workcube.com', 
+                departman: 'IT', 
+                pozisyon: 'Backend Developer' 
+              } 
+            }
+          ],
+          aksiyonlar: [
+            {
+              id: 3,
+              baslik: 'Sunucu Performans Analizi',
+              aciklama: 'Mevcut sunucu kaynaklarını değerlendir',
+              durum: 'beklemede',
+              baslangicTarihi: '2025-08-16',
+              bitisTarihi: '2025-08-20',
+              oncelik: 'yuksek',
+              olusturmaTarihi: '2025-08-15T09:00:00Z',
+              sorumluKisiler: [
+                {
+                  id: 3,
+                  kullaniciId: 2,
+                  rol: 'Backend Developer',
+                  onaylandi: false,
+                  onayTarihi: null,
+                  yorum: null,
+                  kullanici: { 
+                    id: 2, 
+                    adSoyad: 'Fatma Kaya', 
+                    email: 'fatma@workcube.com', 
+                    departman: 'IT', 
+                    pozisyon: 'Backend Developer' 
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        '4': {
+          id: 4,
+          baslik: 'Ayşe\'nin QA Sorumluluğu Toplantısı',
+          aciklama: 'Kalite süreçleri değerlendirmesi',
+          tarih: '2025-08-20',
+          saat: '15:00',
+          sure: 45,
+          durum: 'aktif',
+          onlineLink: 'https://zoom.us/j/123456789',
+          olusturan: { 
+            id: 1, 
+            adSoyad: 'Ahmet Yılmaz', 
+            email: 'ahmet@workcube.com', 
+            departman: 'IT', 
+            pozisyon: 'Proje Yöneticisi' 
+          },
+          katilimcilar: [],
+          aksiyonlar: [
+            {
+              id: 4,
+              baslik: 'QA Testleri Hazırlama',
+              aciklama: 'Yeni özellikler için test senaryoları',
+              durum: 'beklemede',
+              baslangicTarihi: '2025-08-21',
+              bitisTarihi: '2025-08-25',
+              oncelik: 'yuksek',
+              olusturmaTarihi: '2025-08-20T15:00:00Z',
+              sorumluKisiler: [
+                {
+                  id: 4,
+                  kullaniciId: 3,
+                  rol: 'QA Engineer',
+                  onaylandi: false,
+                  onayTarihi: null,
+                  yorum: null,
+                  kullanici: { 
+                    id: 3, 
+                    adSoyad: 'Ayşe Demir', 
+                    email: 'ayse@workcube.com', 
+                    departman: 'QA', 
+                    pozisyon: 'QA Engineer' 
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+
+      const selectedMeeting = demoMeetings[meetingId]
+      
+      if (!selectedMeeting) {
+        // Meeting not found or user doesn't have access
+        setMeeting(null)
+        setLoading(false)
+        return
+      }
+
+      // Check if user has access to this meeting
+      const hasAccess = (
+        selectedMeeting.olusturan.id === user.id || // Creator
+        selectedMeeting.katilimcilar.some(k => k.kullanici.id === user.id) || // Participant
+        selectedMeeting.aksiyonlar.some(a => a.sorumluKisiler.some(s => s.kullaniciId === user.id)) // Action responsible
+      )
+
+      if (!hasAccess) {
+        // User doesn't have access to this meeting
+        setMeeting(null)
+        setLoading(false)
+        return
+      }
+
+      setMeeting(selectedMeeting)
     } catch (error) {
       console.error('Meeting detail fetch error:', error)
     } finally {
       setLoading(false)
     }
-  }, [meetingId])
+  }, [meetingId, user])
 
   useEffect(() => {
     fetchMeetingDetail()
@@ -371,6 +514,21 @@ export default function MeetingDetailPage() {
     return ((now - start) / (end - start)) * 100
   }
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Kimlik doğrulanıyor...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return null // Will redirect in useEffect
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -386,7 +544,8 @@ export default function MeetingDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-600">Toplantı bulunamadı</p>
+          <p className="text-xl text-gray-600">Toplantı bulunamadı veya erişim yetkiniz yok</p>
+          <p className="text-sm text-gray-500 mt-2">Bu toplantıya erişim için oluşturan, katılımcı veya aksiyon sorumlusu olmalısınız.</p>
           <Link href="/meetings" className="text-blue-600 hover:text-blue-700 mt-4 inline-block">
             Toplantılara Dön
           </Link>
