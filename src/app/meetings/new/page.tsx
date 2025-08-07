@@ -60,18 +60,27 @@ export default function NewMeetingPage() {
 
   const fetchUsers = async () => {
     try {
-      // Demo users - gerçek API'de /api/users kullanılacak
-      const demoUsers: User[] = [
-        { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
-        { id: 2, adSoyad: 'Fatma Kaya', email: 'fatma@workcube.com', departman: 'İK', pozisyon: 'İK Uzmanı' },
-        { id: 3, adSoyad: 'Mehmet Öz', email: 'mehmet@workcube.com', departman: 'Satış', pozisyon: 'Satış Temsilcisi' },
-        { id: 4, adSoyad: 'Ayşe Demir', email: 'ayse@workcube.com', departman: 'Pazarlama', pozisyon: 'Pazarlama Uzmanı' },
-        { id: 5, adSoyad: 'Can Özkan', email: 'can@workcube.com', departman: 'IT', pozisyon: 'Frontend Developer' },
-        { id: 6, adSoyad: 'Zeynep Aslan', email: 'zeynep@workcube.com', departman: 'Muhasebe', pozisyon: 'Mali Müşavir' }
-      ]
-      setUsers(demoUsers)
+      const response = await fetch('/api/users', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setUsers(data.data)
+        } else {
+          console.error('API error:', data.error)
+          setUsers([])
+        }
+      } else {
+        console.error('API request failed:', response.status)
+        setUsers([])
+      }
     } catch (error) {
       console.error('Users fetch error:', error)
+      setUsers([])
     }
   }
 
@@ -107,35 +116,26 @@ export default function NewMeetingPage() {
         olusturanId: user.id
       }
 
-      try {
-        // Try real API first
-        const response = await fetch('/api/meetings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify(meetingData)
-        })
+      const response = await fetch('/api/meetings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(meetingData)
+      })
 
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success) {
-            alert('Toplantı başarıyla oluşturuldu!')
-            window.location.href = '/meetings'
-            return
-          }
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          alert('Toplantı başarıyla oluşturuldu!')
+          window.location.href = '/meetings'
+        } else {
+          alert('Toplantı oluşturulamadı: ' + data.error)
         }
-      } catch (apiError) {
-        console.log('API not available, simulating success')
+      } else {
+        alert('Toplantı oluşturulurken hata oluştu!')
       }
-
-      // Demo fallback - simulate successful creation
-      console.log('Creating meeting:', meetingData)
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      alert(`Toplantı başarıyla oluşturuldu!\nOluşturan: ${user.adSoyad}`)
-      window.location.href = '/meetings'
     } catch (error) {
       console.error('Meeting creation error:', error)
       alert('Toplantı oluşturulurken hata oluştu. Lütfen tekrar deneyin.')

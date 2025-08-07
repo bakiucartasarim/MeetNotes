@@ -60,113 +60,27 @@ export default function MeetingsPage() {
     if (!user?.id) return
 
     try {
-      // Try real API first
-      try {
-        const response = await fetch(`/api/meetings?kullanici_id=${user.id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-        
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success) {
-            setMeetings(data.data)
-            setLoading(false)
-            return
-          }
+      const response = await fetch(`/api/meetings?kullanici_id=${user.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
-      } catch (apiError) {
-        console.log('API not available, using demo data')
-      }
-
-      // Fallback to demo data filtered by current user
-      const demoMeetings: Meeting[] = [
-        {
-          id: 1,
-          baslik: 'Haftalık Proje Değerlendirmesi',
-          aciklama: 'Sprint sonucu ve gelecek hafta planlaması',
-          tarih: '2025-08-10',
-          saat: '14:00',
-          sure: 90,
-          durum: 'aktif',
-          konum: 'Toplantı Salonu A',
-          olusturan: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
-          katilimcilar: [
-            { id: 1, katilimDurumu: 'kabul', kullanici: { id: 2, adSoyad: 'Fatma Kaya', email: 'fatma@workcube.com', departman: 'IT', pozisyon: 'Developer' } },
-            { id: 2, katilimDurumu: 'beklemede', kullanici: { id: 3, adSoyad: 'Mehmet Öz', email: 'mehmet@workcube.com', departman: 'IT', pozisyon: 'QA' } }
-          ],
-          aksiyonlar: [
-            { id: 1, baslik: 'API dokümantasyonu güncelleme', durum: 'beklemede' },
-            { id: 2, baslik: 'Test senaryoları yazılması', durum: 'devam_ediyor' }
-          ]
-        },
-        {
-          id: 2,
-          baslik: 'Müşteri Geri Bildirim Toplantısı',
-          aciklama: 'Q4 müşteri memnuniyet anketleri değerlendirmesi',
-          tarih: '2025-08-12',
-          saat: '10:30',
-          sure: 60,
-          durum: 'aktif',
-          onlineLink: 'https://meet.google.com/abc-def-ghi',
-          olusturan: { id: 2, adSoyad: 'Ayşe Demir', email: 'ayse@workcube.com', departman: 'Pazarlama', pozisyon: 'Pazarlama Müdürü' },
-          katilimcilar: [
-            { id: 3, katilimDurumu: 'kabul', kullanici: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' } }
-          ],
-          aksiyonlar: [
-            { id: 3, baslik: 'Anket sonuçlarının analizi', durum: 'tamamlandi' }
-          ]
-        },
-        {
-          id: 3,
-          baslik: 'Fatma\'nın Katıldığı Toplantı',
-          aciklama: 'Fatma katılımcı olarak davet edilmiş',
-          tarih: '2025-08-15',
-          saat: '09:00',
-          sure: 60,
-          durum: 'aktif',
-          konum: 'Toplantı Salonu B',
-          olusturan: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
-          katilimcilar: [
-            { id: 4, katilimDurumu: 'beklemede', kullanici: { id: 2, adSoyad: 'Fatma Kaya', email: 'fatma@workcube.com', departman: 'IT', pozisyon: 'Developer' } }
-          ],
-          aksiyonlar: []
-        },
-        {
-          id: 4,
-          baslik: 'Ayşe\'nin Aksiyon Sorumlusu Olduğu Toplantı',
-          aciklama: 'Ayşe bir aksiyondan sorumlu',
-          tarih: '2025-08-20',
-          saat: '15:00',
-          sure: 45,
-          durum: 'aktif',
-          onlineLink: 'https://zoom.us/j/123456789',
-          olusturan: { id: 1, adSoyad: 'Ahmet Yılmaz', email: 'ahmet@workcube.com', departman: 'IT', pozisyon: 'Proje Yöneticisi' },
-          katilimcilar: [],
-          aksiyonlar: [
-            { id: 4, baslik: 'QA testleri hazırlama', durum: 'beklemede' }
-          ]
-        }
-      ]
-      
-      // Filter demo data by current user (simulating the API logic)
-      const userMeetings = demoMeetings.filter(meeting => {
-        // 1. User is creator
-        if (meeting.olusturan.id === user.id) return true
-        
-        // 2. User is participant  
-        if (meeting.katilimcilar.some(k => k.kullanici.id === user.id)) return true
-        
-        // 3. User is responsible for any action (simulated - in real API this would be checked)
-        if (user.id === 3 && meeting.id === 4) return true // Ayşe (id:3) for meeting 4
-        
-        return false
       })
       
-      setMeetings(userMeetings)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setMeetings(data.data)
+        } else {
+          console.error('API error:', data.error)
+          setMeetings([])
+        }
+      } else {
+        console.error('API request failed:', response.status)
+        setMeetings([])
+      }
     } catch (error) {
       console.error('Meetings fetch error:', error)
+      setMeetings([])
     } finally {
       setLoading(false)
     }
