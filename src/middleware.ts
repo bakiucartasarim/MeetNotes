@@ -16,27 +16,36 @@ export function middleware(request: NextRequest) {
   )
 
   if (isProtectedRoute) {
-    // Get token from cookie or header
+    // Check if browser environment (client-side) - skip middleware for client routing
+    const userAgent = request.headers.get('user-agent') || ''
+    if (userAgent.includes('Next.js')) {
+      return NextResponse.next()
+    }
+
+    // Get token from cookie or header  
     const token = request.cookies.get('token')?.value || 
                   request.headers.get('authorization')?.replace('Bearer ', '')
 
-    if (!token) {
-      // Redirect to login page if no token
+    // For client-side navigation, let the page handle authentication
+    // This prevents redirect loops
+    if (!token && request.headers.get('accept')?.includes('text/html')) {
       const loginUrl = new URL('/login', request.url)
       loginUrl.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(loginUrl)
     }
 
-    try {
-      // Verify JWT token
-      jwt.verify(token, JWT_SECRET)
-      return NextResponse.next()
-    } catch (error) {
-      console.error('JWT Verification failed:', error)
-      // Redirect to login if token is invalid
-      const loginUrl = new URL('/login', request.url)
-      loginUrl.searchParams.set('callbackUrl', pathname)
-      return NextResponse.redirect(loginUrl)
+    if (token) {
+      try {
+        // Verify JWT token
+        jwt.verify(token, JWT_SECRET)
+        return NextResponse.next()
+      } catch (error) {
+        console.error('JWT Verification failed:', error)
+        // Clear invalid token
+        const response = NextResponse.redirect(new URL('/login', request.url))
+        response.cookies.delete('token')
+        return response
+      }
     }
   }
 

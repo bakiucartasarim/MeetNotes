@@ -44,6 +44,12 @@ export default function LoginPage() {
         // Use AuthContext to handle login
         login(data.token, data.user)
         
+        // Also set cookie for middleware
+        document.cookie = `token=${data.token}; path=/; max-age=${7 * 24 * 60 * 60}` // 7 days
+        
+        // Show success message
+        alert(`${data.message}\nHoş geldiniz ${data.user.adSoyad}!`)
+        
         // Redirect to meetings page
         router.push('/meetings')
       } else {
