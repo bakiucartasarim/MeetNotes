@@ -2,10 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function HomePage() {
+  const { user, isAuthenticated, loading: authLoading } = useAuth()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      window.location.href = '/meetings'
+    }
+  }, [isAuthenticated, authLoading])
 
   useEffect(() => {
     fetchUsers()
@@ -23,6 +32,18 @@ export default function HomePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -58,57 +79,61 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-16">
-          <Link 
-            href="/login" 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            <span>Giriş Yap</span>
-          </Link>
-          <Link 
-            href="/register" 
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
-            <span>Kayıt Ol</span>
-          </Link>
-        </div>
+        {/* Quick Actions - only show if not authenticated */}
+        {!authLoading && !isAuthenticated && (
+          <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-16">
+            <Link 
+              href="/login" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              <span>Giriş Yap</span>
+            </Link>
+            <Link 
+              href="/register" 
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+              </svg>
+              <span>Kayıt Ol</span>
+            </Link>
+          </div>
+        )}
 
-        {/* Demo Login */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-16 text-center">
-          <div className="flex items-center justify-center mb-3">
-            <svg className="w-6 h-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-lg font-semibold text-yellow-800">Demo Hesaplar Mevcut</h3>
+        {/* Demo Login - only show if not authenticated */}
+        {!authLoading && !isAuthenticated && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-16 text-center">
+            <div className="flex items-center justify-center mb-3">
+              <svg className="w-6 h-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-lg font-semibold text-yellow-800">Demo Hesaplar Mevcut</h3>
+            </div>
+            <p className="text-sm text-yellow-700 mb-4">
+              Sistemi test etmek için demo hesaplarla giriş yapabilirsiniz
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div className="bg-white p-3 rounded-lg border border-yellow-200">
+                <p className="font-medium text-gray-900">Proje Yöneticisi</p>
+                <p className="text-gray-600">ahmet@workcube.com</p>
+                <p className="text-gray-600">Şifre: 123456</p>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-yellow-200">
+                <p className="font-medium text-gray-900">Developer</p>
+                <p className="text-gray-600">fatma@workcube.com</p>
+                <p className="text-gray-600">Şifre: 123456</p>
+              </div>
+              <div className="bg-white p-3 rounded-lg border border-yellow-200">
+                <p className="font-medium text-gray-900">QA Engineer</p>
+                <p className="text-gray-600">ayse@workcube.com</p>
+                <p className="text-gray-600">Şifre: 123456</p>
+              </div>
+            </div>
           </div>
-          <p className="text-sm text-yellow-700 mb-4">
-            Sistemi test etmek için demo hesaplarla giriş yapabilirsiniz
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Proje Yöneticisi</p>
-              <p className="text-gray-600">ahmet@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Developer</p>
-              <p className="text-gray-600">fatma@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">QA Engineer</p>
-              <p className="text-gray-600">ayse@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
