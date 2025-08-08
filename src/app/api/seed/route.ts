@@ -17,6 +17,16 @@ export async function POST() {
       })
     }
 
+    // Create demo company first
+    const company = await prisma.sirket.create({
+      data: {
+        ad: 'WorkCube Demo',
+        aciklama: 'Demo şirketi - toplantı yönetim sistemi',
+        website: 'https://demo.workcube.com',
+        aktif: true
+      }
+    })
+
     // 1. Create demo users with hashed passwords
     const users = await prisma.$transaction(async (tx) => {
       const createdUsers = []
@@ -34,6 +44,7 @@ export async function POST() {
           data: {
             ...user,
             sifre: hashedPassword,
+            sirketId: company.id,
             aktif: true,
             emailOnaylandi: true
           }
@@ -57,6 +68,7 @@ export async function POST() {
           saat: new Date('1970-01-01T14:00:00'),
           sure: 90,
           olusturanId: users[0].id, // Ahmet
+          sirketId: company.id,
           konum: 'Toplantı Salonu A',
           onlineLink: 'https://meet.google.com/abc-def-ghi',
           durum: 'aktif'
@@ -82,6 +94,7 @@ export async function POST() {
           saat: new Date('1970-01-01T10:30:00'),
           sure: 60,
           olusturanId: users[2].id, // Ayşe
+          sirketId: company.id,
           onlineLink: 'https://meet.google.com/xyz-uvw-rst',
           durum: 'aktif'
         }
@@ -106,6 +119,7 @@ export async function POST() {
           saat: new Date('1970-01-01T09:00:00'),
           sure: 60,
           olusturanId: users[0].id, // Ahmet
+          sirketId: company.id,
           konum: 'Toplantı Salonu B',
           durum: 'aktif'
         }
@@ -130,6 +144,7 @@ export async function POST() {
           saat: new Date('1970-01-01T15:00:00'),
           sure: 45,
           olusturanId: users[0].id, // Ahmet
+          sirketId: company.id,
           onlineLink: 'https://zoom.us/j/123456789',
           durum: 'aktif'
         }
