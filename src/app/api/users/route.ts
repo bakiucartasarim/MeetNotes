@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
         telefon: data.telefon,
         departman: data.departman,
         pozisyon: data.pozisyon,
+        sirketId: data.sirketId,
       },
       select: {
         id: true,
