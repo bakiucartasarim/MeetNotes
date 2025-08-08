@@ -241,7 +241,7 @@ async function main() {
 
   // Create sample actions for WorkCube meetings
   console.log('Creating sample actions...')
-  const action1 = await prisma.aksiyon.upsert({
+  const action1 = await prisma.toplantiAksiyon.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -255,7 +255,7 @@ async function main() {
     }
   })
 
-  const action2 = await prisma.aksiyon.upsert({
+  const action2 = await prisma.toplantiAksiyon.upsert({
     where: { id: 2 },
     update: {},
     create: {
@@ -271,7 +271,7 @@ async function main() {
 
   // Create action responsible people
   console.log('Creating action responsible people...')
-  await prisma.aksiyonSorumlu.createMany({
+  await prisma.aksiyonSorumluKisi.createMany({
     data: [
       // Action 1 responsible people
       { aksiyonId: action1.id, kullaniciId: fatma.id, rol: 'Ana Sorumlu' },
