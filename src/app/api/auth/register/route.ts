@@ -7,11 +7,18 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 
 export async function POST(request: NextRequest) {
   try {
-    const { adSoyad, email, sifre, departman, pozisyon } = await request.json()
+    const { adSoyad, email, sifre, departman, pozisyon, sirketId, yeniSirket } = await request.json()
     
     if (!adSoyad || !email || !sifre) {
       return NextResponse.json(
         { success: false, error: 'Ad soyad, e-posta ve şifre gerekli' },
+        { status: 400 }
+      )
+    }
+
+    if (!sirketId && !yeniSirket) {
+      return NextResponse.json(
+        { success: false, error: 'Şirket seçimi gerekli' },
         { status: 400 }
       )
     }
@@ -38,6 +45,19 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcryptjs.hash(sifre, 12)
 
+    let finalSirketId = sirketId
+
+    // Create new company if needed
+    if (!sirketId && yeniSirket) {
+      const newCompany = await prisma.sirket.create({
+        data: {
+          ad: yeniSirket,
+          aktif: true
+        }
+      })
+      finalSirketId = newCompany.id
+    }
+
     // Create user
     const user = await prisma.kullanici.create({
       data: {
@@ -46,6 +66,7 @@ export async function POST(request: NextRequest) {
         sifre: hashedPassword,
         departman: departman || null,
         pozisyon: pozisyon || null,
+        sirketId: parseInt(finalSirketId),
         aktif: true,
         emailOnaylandi: false // In production, send email verification
       },
@@ -55,6 +76,7 @@ export async function POST(request: NextRequest) {
         email: true,
         departman: true,
         pozisyon: true,
+        sirketId: true,
         emailOnaylandi: true,
         createdAt: true
       }
@@ -65,7 +87,8 @@ export async function POST(request: NextRequest) {
       { 
         id: user.id, 
         email: user.email,
-        adSoyad: user.adSoyad
+        adSoyad: user.adSoyad,
+        sirketId: user.sirketId
       },
       JWT_SECRET,
       { expiresIn: '7d' }

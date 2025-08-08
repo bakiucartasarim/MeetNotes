@@ -7,6 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Sirket {
+  id                    Int                     @id @default(autoincrement())
+  ad                    String
+  aciklama              String?
+  website               String?
+  aktif                 Boolean                 @default(true)
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @default(now()) @updatedAt @map("updated_at")
+  
+  // Relations
+  kullanicilar          Kullanici[]
+  toplantilar           Toplanti[]
+
+  @@map("sirketler")
+}
+
 model Kullanici {
   id                    Int                     @id @default(autoincrement())
   adSoyad               String                  @map("ad_soyad")
@@ -15,6 +31,7 @@ model Kullanici {
   telefon               String?
   departman             String?
   pozisyon              String?
+  sirketId              Int                     @map("sirket_id")
   aktif                 Boolean                 @default(true)
   emailOnaylandi        Boolean                 @default(false) @map("email_onaylandi")
   sonGirisTarihi        DateTime?               @map("son_giris_tarihi")
@@ -22,6 +39,7 @@ model Kullanici {
   updatedAt             DateTime                @default(now()) @updatedAt @map("updated_at")
   
   // Relations
+  sirket                Sirket                  @relation(fields: [sirketId], references: [id], onDelete: Cascade)
   olusturduguToplantilar Toplanti[]            @relation("ToplantiOlusturan")
   katilimlar            ToplantiKatilimci[]
   sorumluOlduguAksiyonlar AksiyonSorumluKisi[]
@@ -37,6 +55,7 @@ model Toplanti {
   saat             DateTime            @db.Time
   sure             Int                 @default(60) // Dakika cinsinden
   olusturanId      Int                 @map("olusturan_id")
+  sirketId         Int                 @map("sirket_id")
   olusturmaTarihi  DateTime            @default(now()) @map("olusturma_tarihi")
   guncellemeTarihi DateTime            @default(now()) @updatedAt @map("guncelleme_tarihi")
   durum            ToplantiDurum       @default(aktif)
@@ -44,6 +63,7 @@ model Toplanti {
   onlineLink       String?             @map("online_link")
 
   // Relations
+  sirket           Sirket              @relation(fields: [sirketId], references: [id], onDelete: Cascade)
   olusturan        Kullanici           @relation("ToplantiOlusturan", fields: [olusturanId], references: [id], onDelete: Cascade)
   katilimcilar     ToplantiKatilimci[]
   aksiyonlar       ToplantiAksiyon[]

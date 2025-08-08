@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -9,15 +9,36 @@ export default function RegisterPage() {
   const router = useRouter()
   const { login } = useAuth()
   const [loading, setLoading] = useState(false)
+  const [companies, setCompanies] = useState<{id: number, ad: string}[]>([])
   const [form, setForm] = useState({
     adSoyad: '',
     email: '',
     sifre: '',
     sifreTekrar: '',
     departman: '',
-    pozisyon: ''
+    pozisyon: '',
+    sirketId: '',
+    yeniSirket: ''
   })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetchCompanies()
+  }, [])
+
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/companies')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setCompanies(data.data)
+        }
+      }
+    } catch (error) {
+      console.error('Companies fetch error:', error)
+    }
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -57,7 +78,9 @@ export default function RegisterPage() {
           email: form.email,
           sifre: form.sifre,
           departman: form.departman,
-          pozisyon: form.pozisyon
+          pozisyon: form.pozisyon,
+          sirketId: form.sirketId === 'yeni' ? null : form.sirketId,
+          yeniSirket: form.sirketId === 'yeni' ? form.yeniSirket : null
         }),
       })
 
@@ -143,6 +166,46 @@ export default function RegisterPage() {
                 placeholder="ornek@sirket.com"
               />
             </div>
+
+            <div>
+              <label htmlFor="sirketId" className="block text-sm font-medium text-gray-700 mb-2">
+                Şirket *
+              </label>
+              <select
+                id="sirketId"
+                name="sirketId"
+                required
+                value={form.sirketId}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              >
+                <option value="">Şirketinizi seçin</option>
+                {companies.map(company => (
+                  <option key={company.id} value={company.id.toString()}>
+                    {company.ad}
+                  </option>
+                ))}
+                <option value="yeni">+ Yeni Şirket Ekle</option>
+              </select>
+            </div>
+
+            {form.sirketId === 'yeni' && (
+              <div>
+                <label htmlFor="yeniSirket" className="block text-sm font-medium text-gray-700 mb-2">
+                  Yeni Şirket Adı *
+                </label>
+                <input
+                  type="text"
+                  id="yeniSirket"
+                  name="yeniSirket"
+                  required
+                  value={form.yeniSirket}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="Şirket adını girin"
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>

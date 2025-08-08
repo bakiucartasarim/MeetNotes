@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
           sifre: true,
           departman: true,
           pozisyon: true,
+          sirketId: true,
           aktif: true,
           emailOnaylandi: true
         }
@@ -95,7 +96,8 @@ export async function POST(request: NextRequest) {
           { 
             id: user.id, 
             email: user.email,
-            adSoyad: user.adSoyad
+            adSoyad: user.adSoyad,
+            sirketId: user.sirketId
           },
           JWT_SECRET,
           { expiresIn: '7d' }
@@ -108,6 +110,7 @@ export async function POST(request: NextRequest) {
           email: user.email,
           departman: user.departman,
           pozisyon: user.pozisyon,
+          sirketId: user.sirketId,
           emailOnaylandi: user.emailOnaylandi
         }
 

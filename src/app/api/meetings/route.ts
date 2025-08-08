@@ -13,8 +13,22 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // Get user's company ID
+    const user = await prisma.kullanici.findUnique({
+      where: { id: parseInt(kullaniciId) },
+      select: { sirketId: true }
+    })
+    
+    if (!user || !user.sirketId) {
+      return NextResponse.json(
+        { success: false, error: 'Kullanıcı şirket bilgisi bulunamadı' },
+        { status: 400 }
+      )
+    }
+
     const meetings = await prisma.toplanti.findMany({
       where: {
+        sirketId: user.sirketId, // Only meetings from same company
         OR: [
           // 1. Toplantıyı oluşturan
           { olusturanId: parseInt(kullaniciId) },
@@ -76,6 +90,19 @@ export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
     
+    // Get user's company ID
+    const user = await prisma.kullanici.findUnique({
+      where: { id: parseInt(data.olusturanId) },
+      select: { sirketId: true }
+    })
+    
+    if (!user || !user.sirketId) {
+      return NextResponse.json(
+        { success: false, error: 'Kullanıcı şirket bilgisi bulunamadı' },
+        { status: 400 }
+      )
+    }
+    
     const meeting = await prisma.toplanti.create({
       data: {
         baslik: data.baslik,
@@ -84,6 +111,7 @@ export async function POST(request: NextRequest) {
         saat: new Date(`1970-01-01T${data.saat}`),
         sure: parseInt(data.sure) || 60,
         olusturanId: parseInt(data.olusturanId),
+        sirketId: user.sirketId,
         konum: data.konum,
         onlineLink: data.onlineLink,
         durum: data.durum || 'aktif'

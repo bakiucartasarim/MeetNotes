@@ -8,6 +8,7 @@ interface User {
   email: string
   departman?: string
   pozisyon?: string
+  sirketId?: number
   emailOnaylandi: boolean
 }
 

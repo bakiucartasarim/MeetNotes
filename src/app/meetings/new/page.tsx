@@ -48,7 +48,9 @@ export default function NewMeetingPage() {
   })
 
   useEffect(() => {
-    fetchUsers()
+    if (user?.sirketId) {
+      fetchUsers()
+    }
     // Set default date to tomorrow
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
@@ -56,11 +58,13 @@ export default function NewMeetingPage() {
       ...prev,
       tarih: tomorrow.toISOString().split('T')[0]
     }))
-  }, [])
+  }, [user])
 
   const fetchUsers = async () => {
+    if (!user?.sirketId) return
+
     try {
-      const response = await fetch('/api/users', {
+      const response = await fetch(`/api/users?sirket_id=${user.sirketId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

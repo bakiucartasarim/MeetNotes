@@ -2,16 +2,32 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcryptjs from 'bcryptjs'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url)
+    const sirketId = searchParams.get('sirket_id')
+    
+    if (!sirketId) {
+      return NextResponse.json(
+        { success: false, error: 'sirket_id gerekli' },
+        { status: 400 }
+      )
+    }
+
     const users = await prisma.kullanici.findMany({
-      where: { aktif: true },
+      where: { 
+        aktif: true,
+        sirketId: parseInt(sirketId)
+      },
       select: {
         id: true,
         adSoyad: true,
         email: true,
         departman: true,
         pozisyon: true
+      },
+      orderBy: {
+        adSoyad: 'asc'
       }
     })
 

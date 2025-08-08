@@ -46,6 +46,7 @@ interface Meeting {
   durum: string
   konum?: string
   onlineLink?: string
+  sirketId: number
   olusturan: User
   katilimcilar: Array<{
     id: number
@@ -63,6 +64,7 @@ export default function MeetingDetailPage() {
   
   const [meeting, setMeeting] = useState<Meeting | null>(null)
   const [loading, setLoading] = useState(true)
+  const [companyUsers, setCompanyUsers] = useState<User[]>([])
   const [newActionModal, setNewActionModal] = useState(false)
   const [commentModal, setCommentModal] = useState<{actionId: number, responsibleId: number} | null>(null)
   const [comment, setComment] = useState('')
@@ -98,6 +100,10 @@ export default function MeetingDetailPage() {
         const data = await response.json()
         if (data.success) {
           setMeeting(data.data)
+          // Fetch company users for new action modal
+          if (data.data.sirketId) {
+            fetchCompanyUsers(data.data.sirketId)
+          }
         } else {
           console.error('API error:', data.error)
           setMeeting(null)
@@ -120,6 +126,25 @@ export default function MeetingDetailPage() {
   useEffect(() => {
     fetchMeetingDetail()
   }, [fetchMeetingDetail])
+
+  const fetchCompanyUsers = useCallback(async (sirketId: number) => {
+    try {
+      const response = await fetch(`/api/users?sirket_id=${sirketId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setCompanyUsers(data.data)
+        }
+      }
+    } catch (error) {
+      console.error('Company users fetch error:', error)
+    }
+  }, [])
 
   const handleApproveAction = async (actionId: number, responsibleId: number, approved: boolean, comment: string = '') => {
     if (!meeting) return
@@ -699,24 +724,24 @@ export default function MeetingDetailPage() {
                   Sorumlu Kişiler
                 </label>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {meeting?.katilimcilar.map((participant) => (
-                    <label key={participant.id} className="flex items-center space-x-3 cursor-pointer">
+                  {companyUsers.map((companyUser) => (
+                    <label key={companyUser.id} className="flex items-center space-x-3 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={newAction.sorumluKisiler.some(s => s.kullaniciId === participant.kullanici.id)}
+                        checked={newAction.sorumluKisiler.some(s => s.kullaniciId === companyUser.id)}
                         onChange={(e) => {
                           if (e.target.checked) {
                             setNewAction({
                               ...newAction,
                               sorumluKisiler: [...newAction.sorumluKisiler, {
-                                kullaniciId: participant.kullanici.id,
-                                rol: participant.kullanici.pozisyon
+                                kullaniciId: companyUser.id,
+                                rol: companyUser.pozisyon || 'Sorumlu'
                               }]
                             })
                           } else {
                             setNewAction({
                               ...newAction,
-                              sorumluKisiler: newAction.sorumluKisiler.filter(s => s.kullaniciId !== participant.kullanici.id)
+                              sorumluKisiler: newAction.sorumluKisiler.filter(s => s.kullaniciId !== companyUser.id)
                             })
                           }
                         }}
@@ -724,9 +749,10 @@ export default function MeetingDetailPage() {
                       />
                       <div className="flex items-center space-x-2">
                         <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {participant.kullanici.adSoyad.split(' ').map(n => n[0]).join('')}
+                          {companyUser.adSoyad.split(' ').map(n => n[0]).join('')}
                         </div>
-                        <span className="text-sm">{participant.kullanici.adSoyad}</span>
+                        <span className="text-sm">{companyUser.adSoyad}</span>
+                        <span className="text-xs text-gray-500">({companyUser.pozisyon})</span>
                       </div>
                     </label>
                   ))}
