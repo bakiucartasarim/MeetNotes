@@ -56,38 +56,19 @@ export default function EmployeesPage() {
   const fetchEmployees = async () => {
     try {
       setLoading(true)
-      // TODO: API endpoint for company employees
-      // Şimdilik mock data
-      const mockEmployees: Employee[] = [
-        {
-          id: 1,
-          adSoyad: 'Ahmet Yılmaz',
-          email: 'ahmet@workcube.com',
-          departman: 'Yönetim',
-          pozisyon: 'Proje Yöneticisi',
-          rol: 'YONETICI',
-          olusturmaTarihi: '2024-01-15'
-        },
-        {
-          id: 2,
-          adSoyad: 'Fatma Kaya',
-          email: 'fatma@workcube.com',
-          departman: 'IT',
-          pozisyon: 'Senior Developer',
-          rol: 'CALISAN',
-          olusturmaTarihi: '2024-02-20'
-        },
-        {
-          id: 3,
-          adSoyad: 'Ayşe Demir',
-          email: 'ayse@workcube.com',
-          departman: 'QA',
-          pozisyon: 'QA Engineer',
-          rol: 'CALISAN',
-          olusturmaTarihi: '2024-03-10'
+      const response = await fetch('/api/employees/list', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
-      ]
-      setEmployees(mockEmployees)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setEmployees(data.employees)
+      } else {
+        setError(data.error || 'Çalışanlar yüklenirken hata oluştu')
+      }
     } catch (error) {
       console.error('Employees fetch error:', error)
       setError('Çalışanlar yüklenirken hata oluştu')
@@ -119,7 +100,6 @@ export default function EmployeesPage() {
     }
 
     try {
-      // TODO: API endpoint for adding employee
       const response = await fetch('/api/employees/add', {
         method: 'POST',
         headers: {
