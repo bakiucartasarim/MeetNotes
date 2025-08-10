@@ -147,9 +147,9 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Henüz hesabınız yok mu?{' '}
-              <Link href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
-                Kayıt Ol
+              Şirketiniz henüz sisteme kayıtlı değil mi?{' '}
+              <Link href="/company-register" className="text-teal-600 hover:text-teal-700 font-medium">
+                Şirket Kaydı Yap
               </Link>
             </p>
           </div>

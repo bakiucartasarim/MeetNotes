@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, user, isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [companies, setCompanies] = useState<{id: number, ad: string}[]>([])
   const [form, setForm] = useState({
@@ -22,18 +22,33 @@ export default function RegisterPage() {
   })
   const [error, setError] = useState('')
 
+  // Redirect unauthenticated users or non-admin users
   useEffect(() => {
-    fetchCompanies()
-  }, [])
+    if (!authLoading) {
+      if (!isAuthenticated) {
+        router.push('/login')
+        return
+      }
+      if (user && user.rol !== 'YONETICI') {
+        router.push('/meetings')
+        return
+      }
+    }
+  }, [isAuthenticated, authLoading, user, router])
+
+  useEffect(() => {
+    if (isAuthenticated && user && user.rol === 'YONETICI') {
+      fetchCompanies()
+    }
+  }, [isAuthenticated, user])
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch('/api/companies')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success) {
-          setCompanies(data.data)
-        }
+      // Yönetici sadece kendi şirketini görür, ancak API henüz bu kontrolü yapmıyor
+      // Şimdilik mevcut şirketi otomatik seçelim
+      if (user && user.sirket) {
+        setCompanies([{ id: user.sirketId, ad: user.sirket.ad }])
+        setForm(prev => ({ ...prev, sirketId: user.sirketId.toString() }))
       }
     } catch (error) {
       console.error('Companies fetch error:', error)
@@ -47,6 +62,30 @@ export default function RegisterPage() {
       [name]: value
     }))
     setError('')
+  }
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading if user is not admin
+  if (!user || user.rol !== 'YONETICI') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Yönlendiriliyor...</p>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,7 +118,7 @@ export default function RegisterPage() {
           sifre: form.sifre,
           departman: form.departman,
           pozisyon: form.pozisyon,
-          sirketId: form.sirketId
+          sirketId: user?.sirketId
         }),
       })
 
@@ -110,8 +149,8 @@ export default function RegisterPage() {
           <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
             <img src="/logo.webp" alt="Meeting Logo" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Çalışan Kaydı</h1>
-          <p className="text-gray-600">Şirketinizin sistemine katılın</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Çalışan Ekle</h1>
+          <p className="text-gray-600">Şirketinize yeni çalışan ekleyin</p>
         </div>
 
         {/* Register Form */}
@@ -172,30 +211,23 @@ export default function RegisterPage() {
                 <h4 className="text-sm font-semibold text-slate-800">Önemli Bilgi</h4>
               </div>
               <p className="text-sm text-slate-700">
-                Bu sayfa sadece mevcut şirket çalışanları içindir. Şirketiniz henüz sisteme kayıtlı değilse, 
-                önce <Link href="/company-register" className="font-medium underline">şirket kayıt sayfası</Link>ndan şirketinizi kaydetmelisiniz.
+                Bu sayfa sadece şirket yöneticileri içindir. Yönetici olarak şirketinize yeni çalışanlar ekleyebilirsiniz. 
+                Eklenen çalışanlar sisteme giriş yapabilir ve toplantılara katılabilir.
               </p>
             </div>
 
             <div>
-              <label htmlFor="sirketId" className="block text-sm font-medium text-gray-700 mb-2">
-                Şirketiniz *
+              <label htmlFor="sirketInfo" className="block text-sm font-medium text-gray-700 mb-2">
+                Şirket
               </label>
-              <select
-                id="sirketId"
-                name="sirketId"
-                required
-                value={form.sirketId}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-              >
-                <option value="">Şirketinizi seçin</option>
-                {companies.map(company => (
-                  <option key={company.id} value={company.id.toString()}>
-                    {company.ad}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                <p className="text-gray-700 font-medium">
+                  {user?.sirket?.ad || 'Şirket bilgisi yükleniyor...'}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Bu şirkete çalışan ekleyeceksiniz
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -271,28 +303,25 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={loading || !form.email.trim() || !form.sifre.trim() || !form.adSoyad.trim() || !form.sirketId.trim()}
+              disabled={loading || !form.email.trim() || !form.sifre.trim() || !form.adSoyad.trim()}
               className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               )}
-              <span>{loading ? 'Çalışan Kayıt Ediliyor...' : 'Çalışan Olarak Kayıt Ol'}</span>
+              <span>{loading ? 'Çalışan Ekleniyor...' : 'Çalışanı Sisteme Ekle'}</span>
             </button>
           </form>
 
           <div className="mt-6 text-center space-y-3">
             <p className="text-sm text-gray-600">
-              Şirketinizde zaten hesabınız var mı?{' '}
-              <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
-                Giriş Yap
+              Çalışan ekleme işlemi tamamlandı mı?{' '}
+              <Link href="/meetings" className="text-teal-600 hover:text-teal-700 font-medium">
+                Toplantılar Sayfasına Git
               </Link>
             </p>
-            <p className="text-sm text-gray-600">
-              Şirketiniz henüz kayıtlı değil mi?{' '}
-              <Link href="/company-register" className="text-green-600 hover:text-green-700 font-medium">
-                Şirket Kaydı Yap
-              </Link>
+            <p className="text-sm text-gray-500 text-xs">
+              Yönetici panelinden şirketinizin tüm çalışanlarını yönetebilirsiniz.
             </p>
           </div>
 
