@@ -2,16 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import jwt from 'jsonwebtoken'
 
-interface RouteParams {
-  params: { id: string }
-}
-
 export async function POST(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const resolvedParams = await params
   try {
-    const meetingId = parseInt(params.id)
+    const meetingId = parseInt(resolvedParams.id)
     const body = await request.json()
     const { kullaniciId } = body
 
