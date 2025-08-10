@@ -12,7 +12,7 @@ interface Employee {
   departman?: string
   pozisyon?: string
   rol: 'YONETICI' | 'CALISAN'
-  olusturmaTarihi: string
+  createdAt: string
 }
 
 export default function EmployeesPage() {
@@ -413,7 +413,7 @@ export default function EmployeesPage() {
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-400">
-                    {new Date(employee.olusturmaTarihi).toLocaleDateString('tr-TR')}
+                    {new Date(employee.createdAt).toLocaleDateString('tr-TR')}
                   </span>
                   {employee.rol !== 'YONETICI' && (
                     <button

@@ -44,11 +44,11 @@ export async function GET(request: NextRequest) {
         departman: true,
         pozisyon: true,
         rol: true,
-        olusturmaTarihi: true
+        createdAt: true
       },
       orderBy: [
         { rol: 'desc' }, // YONETICI önce
-        { olusturmaTarihi: 'asc' }
+        { createdAt: 'asc' }
       ]
     })
 
