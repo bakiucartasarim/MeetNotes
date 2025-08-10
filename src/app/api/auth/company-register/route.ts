@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import bcrypt from 'bcrypt'
+import bcryptjs from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import prisma from '@/lib/prisma'
 
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(yoneticiSifre, 12)
+    const hashedPassword = await bcryptjs.hash(yoneticiSifre, 12)
 
     // Create company and admin user in transaction
     const result = await prisma.$transaction(async (tx) => {
