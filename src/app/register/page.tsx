@@ -103,14 +103,12 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-600 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <img src="/logo.webp" alt="Meeting Logo" className="w-16 h-16 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Çalışan Kaydı</h1>
           <p className="text-gray-600">Şirketinizin sistemine katılın</p>
@@ -145,7 +143,7 @@ export default function RegisterPage() {
                 required
                 value={form.adSoyad}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 placeholder="Örn: Mehmet Yılmaz"
               />
             </div>
@@ -161,19 +159,19 @@ export default function RegisterPage() {
                 required
                 value={form.email}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 placeholder="ornek@sirket.com"
               />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
               <div className="flex items-center mb-2">
-                <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-slate-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <h4 className="text-sm font-semibold text-blue-800">Önemli Bilgi</h4>
+                <h4 className="text-sm font-semibold text-slate-800">Önemli Bilgi</h4>
               </div>
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-slate-700">
                 Bu sayfa sadece mevcut şirket çalışanları içindir. Şirketiniz henüz sisteme kayıtlı değilse, 
                 önce <Link href="/company-register" className="font-medium underline">şirket kayıt sayfası</Link>ndan şirketinizi kaydetmelisiniz.
               </p>
@@ -189,7 +187,7 @@ export default function RegisterPage() {
                 required
                 value={form.sirketId}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
               >
                 <option value="">Şirketinizi seçin</option>
                 {companies.map(company => (
@@ -210,7 +208,7 @@ export default function RegisterPage() {
                   name="departman"
                   value={form.departman}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 >
                   <option value="">Seçiniz</option>
                   <option value="IT">IT</option>
@@ -233,7 +231,7 @@ export default function RegisterPage() {
                   name="pozisyon"
                   value={form.pozisyon}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                   placeholder="Örn: Developer"
                 />
               </div>
@@ -250,7 +248,7 @@ export default function RegisterPage() {
                 required
                 value={form.sifre}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 placeholder="En az 6 karakter"
               />
             </div>
@@ -266,7 +264,7 @@ export default function RegisterPage() {
                 required
                 value={form.sifreTekrar}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 placeholder="Şifrenizi tekrar girin"
               />
             </div>
@@ -274,7 +272,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading || !form.email.trim() || !form.sifre.trim() || !form.adSoyad.trim() || !form.sirketId.trim()}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
+              className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>

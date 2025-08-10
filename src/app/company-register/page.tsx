@@ -74,14 +74,12 @@ export default function CompanyRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-teal-50 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
+          <div className="w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <img src="/logo.webp" alt="Meeting Logo" className="w-20 h-20 object-contain" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Şirket Kaydı</h1>
           <p className="text-gray-600 text-lg">Şirketinizi sisteme kaydedin ve toplantı yönetimini başlatın</p>
@@ -108,7 +106,7 @@ export default function CompanyRegisterPage() {
             {/* Şirket Bilgileri */}
             <div className="border-b border-gray-200 pb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-teal-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Şirket Bilgileri
@@ -126,7 +124,7 @@ export default function CompanyRegisterPage() {
                     required
                     value={form.sirketAdi}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Örn: Acme Teknoloji A.Ş."
                   />
                 </div>
@@ -141,7 +139,7 @@ export default function CompanyRegisterPage() {
                     value={form.sirketAciklamasi}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Şirketinizin kısa açıklaması..."
                   />
                 </div>
@@ -156,7 +154,7 @@ export default function CompanyRegisterPage() {
                     name="website"
                     value={form.website}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="https://www.sirketiniz.com"
                   />
                 </div>
@@ -166,7 +164,7 @@ export default function CompanyRegisterPage() {
             {/* Yönetici Bilgileri */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <svg className="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-cyan-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 Şirket Yöneticisi Bilgileri
@@ -184,7 +182,7 @@ export default function CompanyRegisterPage() {
                     required
                     value={form.yoneticiAdi}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Örn: Ahmet Yılmaz"
                   />
                 </div>
@@ -199,7 +197,7 @@ export default function CompanyRegisterPage() {
                     name="yoneticiTelefon"
                     value={form.yoneticiTelefon}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="0532 123 45 67"
                   />
                 </div>
@@ -215,7 +213,7 @@ export default function CompanyRegisterPage() {
                     required
                     value={form.yoneticiEmail}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="ahmet@sirketiniz.com"
                   />
                 </div>
@@ -231,7 +229,7 @@ export default function CompanyRegisterPage() {
                     required
                     value={form.yoneticiSifre}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="En az 6 karakter"
                   />
                 </div>
@@ -247,7 +245,7 @@ export default function CompanyRegisterPage() {
                     required
                     value={form.yoneticiSifreTekrar}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Şifrenizi tekrar girin"
                   />
                 </div>
@@ -257,7 +255,7 @@ export default function CompanyRegisterPage() {
             <button
               type="submit"
               disabled={loading || !form.sirketAdi.trim() || !form.yoneticiEmail.trim() || !form.yoneticiSifre.trim() || !form.yoneticiAdi.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 text-lg"
+              className="w-full bg-teal-600 hover:bg-teal-700 disabled:bg-gray-300 text-white font-semibold py-4 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2 text-lg"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
