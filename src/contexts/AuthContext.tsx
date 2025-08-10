@@ -8,8 +8,13 @@ interface User {
   email: string
   departman?: string
   pozisyon?: string
-  sirketId?: number
+  sirketId: number
   emailOnaylandi: boolean
+  rol: 'YONETICI' | 'CALISAN'
+  sirket?: {
+    id: number
+    ad: string
+  }
 }
 
 interface AuthContextType {
