@@ -7,14 +7,19 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   // const router = useRouter() // Will be used for future features
-  const { login, isAuthenticated, loading: authLoading } = useAuth()
+  const { login, user, isAuthenticated, loading: authLoading } = useAuth()
   const [loading, setLoading] = useState(false)
 
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      console.log('User already authenticated, redirecting to meetings')
-      window.location.href = '/meetings'
+      console.log('User already authenticated, redirecting...')
+      // Admin goes to dashboard, employee to meetings
+      if (user && user.rol === 'YONETICI') {
+        window.location.href = '/dashboard'
+      } else {
+        window.location.href = '/meetings'
+      }
     }
   }, [isAuthenticated, authLoading])
   const [form, setForm] = useState({
@@ -58,8 +63,12 @@ export default function LoginPage() {
         // Immediate redirect without alert
         console.log(`${data.message} - Hoş geldiniz ${data.user.adSoyad}!`)
         
-        // Use window.location for immediate redirect
-        window.location.href = '/meetings'
+        // Use window.location for immediate redirect - admin goes to dashboard, employee to meetings
+        if (data.user.rol === 'YONETICI') {
+          window.location.href = '/dashboard'
+        } else {
+          window.location.href = '/meetings'
+        }
       } else {
         setError(data.error || 'Giriş yapılırken hata oluştu')
       }

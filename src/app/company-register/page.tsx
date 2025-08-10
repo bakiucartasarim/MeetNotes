@@ -61,7 +61,7 @@ export default function CompanyRegisterPage() {
 
       if (data.success) {
         login(data.token, data.user)
-        router.push('/meetings')
+        router.push('/dashboard') // Company admin goes to dashboard
       } else {
         setError(data.error || 'Kayıt olurken hata oluştu')
       }
