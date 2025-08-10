@@ -470,7 +470,7 @@ export default function MeetingDetailPage() {
               <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Katılımcılar ({meeting.katilimcilar.length})</h2>
                 {/* Sadece toplantı sahibi veya yönetici katılımcı ekleyebilir */}
-                {user && (meeting.olusturanId === user.id || user.rol === 'YONETICI') && (
+                {user && (meeting.olusturan.id === user.id || user.rol === 'YONETICI') && (
                   <button
                     onClick={() => setAddParticipantModal(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
