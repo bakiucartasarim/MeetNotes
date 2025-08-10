@@ -155,8 +155,14 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
-              ← Ana Sayfaya Dön
+            <Link 
+              href="/" 
+              className="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 transition-colors group"
+            >
+              <svg className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Ana Sayfaya Dön
             </Link>
           </div>
         </div>
