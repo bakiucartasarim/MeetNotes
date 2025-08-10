@@ -68,6 +68,8 @@ export default function MeetingDetailPage() {
   const [newActionModal, setNewActionModal] = useState(false)
   const [commentModal, setCommentModal] = useState<{actionId: number, responsibleId: number} | null>(null)
   const [comment, setComment] = useState('')
+  const [addParticipantModal, setAddParticipantModal] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -268,6 +270,39 @@ export default function MeetingDetailPage() {
     return total > 0 ? (completed / total) * 100 : 0
   }
 
+  const handleAddParticipant = async () => {
+    if (!selectedUserId || !meeting) return
+
+    try {
+      const response = await fetch(`/api/meetings/${meeting.id}/add-participant`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ kullaniciId: selectedUserId })
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        setAddParticipantModal(false)
+        setSelectedUserId(null)
+      } else {
+        alert(data.error || 'Katılımcı eklenirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Add participant error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
+  // Mevcut katılımcı olmayan kullanıcıları filtrele
+  const availableUsers = companyUsers.filter(user => 
+    !meeting?.katilimcilar.some(p => p.kullanici.id === user.id)
+  )
+
   const getTimeProgressPercentage = (startDate: string | null, endDate: string | null) => {
     if (!startDate || !endDate) return 0
     
@@ -432,8 +467,20 @@ export default function MeetingDetailPage() {
 
             {/* Participants */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-              <div className="px-6 py-4 border-b border-gray-200">
+              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900">Katılımcılar ({meeting.katilimcilar.length})</h2>
+                {/* Sadece toplantı sahibi veya yönetici katılımcı ekleyebilir */}
+                {user && (meeting.olusturanId === user.id || user.rol === 'YONETICI') && (
+                  <button
+                    onClick={() => setAddParticipantModal(true)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    <span>Katılımcı Ekle</span>
+                  </button>
+                )}
               </div>
               <div className="p-6">
                 <div className="space-y-3">
@@ -783,6 +830,82 @@ export default function MeetingDetailPage() {
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg transition-colors"
               >
                 Aksiyon Ekle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Participant Modal */}
+      {addParticipantModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Katılımcı Ekle</h3>
+              <button
+                onClick={() => {
+                  setAddParticipantModal(false)
+                  setSelectedUserId(null)
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Eklenecek Kullanıcı
+                </label>
+                {availableUsers.length > 0 ? (
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {availableUsers.map((user) => (
+                      <label key={user.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="selectedUser"
+                          value={user.id}
+                          checked={selectedUserId === user.id}
+                          onChange={() => setSelectedUserId(user.id)}
+                          className="rounded"
+                        />
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {user.adSoyad.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{user.adSoyad}</p>
+                            <p className="text-xs text-gray-500">{user.pozisyon} • {user.departman}</p>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 py-4">Eklenebilecek kullanıcı yok. Tüm şirket çalışanları zaten bu toplantının katılımcısı.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setAddParticipantModal(false)
+                  setSelectedUserId(null)
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleAddParticipant}
+                disabled={!selectedUserId}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+              >
+                Katılımcı Ekle
               </button>
             </div>
           </div>
