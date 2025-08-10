@@ -78,8 +78,8 @@ export default function CompanyRegisterPage() {
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <img src="/logo.webp" alt="Meeting Logo" className="w-20 h-20 object-contain" />
+          <div className="w-24 h-24 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <img src="/logo.webp" alt="Meeting Logo" className="w-24 h-24 object-contain" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Şirket Kaydı</h1>
           <p className="text-gray-600 text-lg">Şirketinizi sisteme kaydedin ve toplantı yönetimini başlatın</p>

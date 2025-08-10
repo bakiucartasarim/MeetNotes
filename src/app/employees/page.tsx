@@ -226,8 +226,8 @@ export default function EmployeesPage() {
                 </svg>
                 Dashboard
               </Link>
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                <img src="/logo.webp" alt="Meeting Logo" className="w-10 h-10 object-contain" />
+              <div className="w-16 h-16 rounded-xl flex items-center justify-center">
+                <img src="/logo.webp" alt="Meeting Logo" className="w-16 h-16 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Çalışan Yönetimi</h1>

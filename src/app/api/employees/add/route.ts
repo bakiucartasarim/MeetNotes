@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     let decodedToken
     try {
-      decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key')
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-change-in-production')
     } catch {
       return NextResponse.json({ success: false, error: 'Geçersiz token' }, { status: 401 })
     }

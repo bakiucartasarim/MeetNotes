@@ -146,8 +146,8 @@ export default function RegisterPage() {
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <img src="/logo.webp" alt="Meeting Logo" className="w-16 h-16 object-contain" />
+          <div className="w-20 h-20 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <img src="/logo.webp" alt="Meeting Logo" className="w-20 h-20 object-contain" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Çalışan Ekle</h1>
           <p className="text-gray-600">Şirketinize yeni çalışan ekleyin</p>
