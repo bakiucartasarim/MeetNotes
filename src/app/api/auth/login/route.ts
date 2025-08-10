@@ -63,7 +63,14 @@ export async function POST(request: NextRequest) {
           pozisyon: true,
           sirketId: true,
           aktif: true,
-          emailOnaylandi: true
+          emailOnaylandi: true,
+          rol: true,
+          sirket: {
+            select: {
+              id: true,
+              ad: true
+            }
+          }
         }
       })
 
@@ -111,7 +118,9 @@ export async function POST(request: NextRequest) {
           departman: user.departman,
           pozisyon: user.pozisyon,
           sirketId: user.sirketId,
-          emailOnaylandi: user.emailOnaylandi
+          emailOnaylandi: user.emailOnaylandi,
+          rol: user.rol,
+          sirket: user.sirket
         }
 
         return NextResponse.json({
