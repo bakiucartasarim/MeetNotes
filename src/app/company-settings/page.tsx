@@ -202,12 +202,12 @@ export default function CompanySettingsPage() {
             <div className="flex items-center space-x-4">
               <Link 
                 href="/dashboard" 
-                className="inline-flex items-center text-gray-500 hover:text-gray-700 transition-colors group"
+                className="inline-flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full transition-all group"
+                title="Dashboard'a Geri Dön"
               >
-                <svg className="w-5 h-5 mr-2 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-gray-600 group-hover:text-gray-800 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Dashboard
               </Link>
               <div className="w-16 h-16 rounded-xl flex items-center justify-center">
                 <img src="/logo.webp" alt="Meeting Logo" className="w-16 h-16 object-contain" />
