@@ -48,8 +48,9 @@ async function main() {
       email: 'ahmet@workcube.com',
       sifre: hashedPassword,
       telefon: '+90 532 123 4567',
-      departman: 'IT',
-      pozisyon: 'Proje Yöneticisi',
+      departman: 'Yönetim',
+      pozisyon: 'Şirket Yöneticisi',
+      rol: 'YONETICI',
       sirketId: workcube.id,
       aktif: true,
       emailOnaylandi: true
@@ -67,6 +68,7 @@ async function main() {
       telefon: '+90 532 234 5678',
       departman: 'IT',
       pozisyon: 'Backend Developer',
+      rol: 'CALISAN',
       sirketId: workcube.id,
       aktif: true,
       emailOnaylandi: true
@@ -84,6 +86,7 @@ async function main() {
       telefon: '+90 532 345 6789',
       departman: 'QA',
       pozisyon: 'QA Engineer',
+      rol: 'CALISAN',
       sirketId: workcube.id,
       aktif: true,
       emailOnaylandi: true
@@ -101,6 +104,7 @@ async function main() {
       telefon: '+90 532 456 7890',
       departman: 'UI/UX',
       pozisyon: 'UI Designer',
+      rol: 'CALISAN',
       sirketId: workcube.id,
       aktif: true,
       emailOnaylandi: true
@@ -118,6 +122,7 @@ async function main() {
       telefon: '+90 532 567 8901',
       departman: 'İnsan Kaynakları',
       pozisyon: 'İK Uzmanı',
+      rol: 'CALISAN',
       sirketId: workcube.id,
       aktif: true,
       emailOnaylandi: true
@@ -135,8 +140,9 @@ async function main() {
       email: 'ali@techcorp.com',
       sifre: hashedPassword,
       telefon: '+90 532 678 9012',
-      departman: 'Yazılım',
-      pozisyon: 'Senior Developer',
+      departman: 'Yönetim',
+      pozisyon: 'Şirket Yöneticisi',
+      rol: 'YONETICI',
       sirketId: techCorp.id,
       aktif: true,
       emailOnaylandi: true
@@ -154,6 +160,7 @@ async function main() {
       telefon: '+90 532 789 0123',
       departman: 'Pazarlama',
       pozisyon: 'Pazarlama Müdürü',
+      rol: 'CALISAN',
       sirketId: techCorp.id,
       aktif: true,
       emailOnaylandi: true
@@ -287,15 +294,18 @@ async function main() {
   console.log('✅ Database seeding completed successfully!')
   console.log('\nCreated:')
   console.log('- 2 companies (WorkCube, TechCorp)')
-  console.log('- 7 users (5 WorkCube, 2 TechCorp)')
+  console.log('- 7 users (5 WorkCube, 2 TechCorp) with roles')
   console.log('- 3 meetings (2 WorkCube, 1 TechCorp)')
   console.log('- 9 meeting participants')
   console.log('- 2 actions with 4 responsible people')
   console.log('\nDefault login credentials:')
-  console.log('Email: ahmet@workcube.com | Password: 123456')
-  console.log('Email: fatma@workcube.com | Password: 123456')
-  console.log('Email: ali@techcorp.com | Password: 123456')
-  console.log('Email: elif@techcorp.com | Password: 123456')
+  console.log('👤 YÖNETİCİLER:')
+  console.log('Email: ahmet@workcube.com | Password: 123456 (WorkCube Yöneticisi)')
+  console.log('Email: ali@techcorp.com | Password: 123456 (TechCorp Yöneticisi)')
+  console.log('👥 ÇALIŞANLAR:')
+  console.log('Email: fatma@workcube.com | Password: 123456 (WorkCube Çalışanı)')
+  console.log('Email: ayse@workcube.com | Password: 123456 (WorkCube Çalışanı)')
+  console.log('Email: elif@techcorp.com | Password: 123456 (TechCorp Çalışanı)')
 }
 
 main()

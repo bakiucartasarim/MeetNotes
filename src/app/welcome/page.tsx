@@ -60,7 +60,7 @@ export default function WelcomePage() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Workcube Toplantı Modülü</h1>
-                <p className="text-sm text-gray-500">Next.js + PostgreSQL + Multi-Person Approval System</p>
+                <p className="text-sm text-gray-500">Şirketler için Özel Toplantı Yönetim Sistemi</p>
               </div>
             </div>
           </div>
@@ -69,36 +69,97 @@ export default function WelcomePage() {
 
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Şirketlere Özel Bilgi Kutucu */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-white text-center mb-16">
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <h2 className="text-3xl font-bold mb-4">Şirketiniz İçin Tasarlandı</h2>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-6">
+            Bu platform sadece kurumsal şirketlere özeldir. Önce şirketinizi kaydedin, 
+            sonra çalışanlarınızı sisteme dahil ederek toplantı yönetimini başlatın.
+          </p>
+          <div className="inline-flex items-center bg-white/10 rounded-lg px-4 py-2">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-sm font-medium">Bireysel kullanıcılar için değil, sadece şirketler için</span>
+          </div>
+        </div>
+
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Modern Toplantı Yönetimi
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <h3 className="text-3xl font-bold text-gray-900 mb-4">
+            Kurumsal Toplantı Yönetimi
+          </h3>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Çoklu kişi onay sistemi, kişi bazlı yorumlar, zaman çizelgesi ve gerçek zamanlı takip 
-            özellikleri ile toplantı süreçlerinizi dijitalleştirin.
+            özellikleri ile şirket toplantı süreçlerinizi dijitalleştirin.
           </p>
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-16">
-          <Link 
-            href="/login" 
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-            </svg>
-            <span>Giriş Yap</span>
-          </Link>
-          <Link 
-            href="/register" 
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-colors flex items-center space-x-3 shadow-sm w-full sm:w-auto justify-center"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
-            <span>Kayıt Ol</span>
-          </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-16">
+          <div className="bg-white rounded-xl shadow-lg border-2 border-blue-200 p-6 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-bold text-gray-900 mb-2">Yeni Şirket</h4>
+            <p className="text-sm text-gray-600 mb-4">Şirketinizi sisteme kaydedin ve yönetici hesabı oluşturun</p>
+            <Link 
+              href="/company-register" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Şirket Kaydet</span>
+            </Link>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-lg border-2 border-green-200 p-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+            </div>
+            <h4 className="text-lg font-bold text-gray-900 mb-2">Mevcut Hesap</h4>
+            <p className="text-sm text-gray-600 mb-4">Şirketiniz zaten kayıtlıysa, giriş yapın</p>
+            <Link 
+              href="/login" 
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
+              <span>Giriş Yap</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Nasıl Çalışır */}
+        <div className="bg-gray-50 rounded-xl p-8 mb-16">
+          <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Nasıl Çalışır?</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Şirket Kaydı</h4>
+              <p className="text-sm text-gray-600">Şirketinizi sisteme kaydedin ve yönetici hesabınız otomatik oluşturulsun</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Çalışan Ekleme</h4>
+              <p className="text-sm text-gray-600">Yönetici olarak şirketinizdeki çalışanları sisteme davet edin</p>
+            </div>
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-2">Toplantı Yönetimi</h4>
+              <p className="text-sm text-gray-600">Toplantılarınızı oluşturun, takip edin ve onay süreçlerini yönetin</p>
+            </div>
+          </div>
         </div>
 
         {/* Demo Login */}
@@ -110,21 +171,21 @@ export default function WelcomePage() {
             <h3 className="text-lg font-semibold text-yellow-800">Demo Hesaplar Mevcut</h3>
           </div>
           <p className="text-sm text-yellow-700 mb-4">
-            Sistemi test etmek için demo hesaplarla giriş yapabilirsiniz
+            Sistemi test etmek için demo şirket hesaplarıyla giriş yapabilirsiniz
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
             <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Proje Yöneticisi</p>
+              <p className="font-medium text-gray-900">Şirket Yöneticisi</p>
               <p className="text-gray-600">ahmet@workcube.com</p>
               <p className="text-gray-600">Şifre: 123456</p>
             </div>
             <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Developer</p>
+              <p className="font-medium text-gray-900">Çalışan</p>
               <p className="text-gray-600">fatma@workcube.com</p>
               <p className="text-gray-600">Şifre: 123456</p>
             </div>
             <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">QA Engineer</p>
+              <p className="font-medium text-gray-900">Çalışan</p>
               <p className="text-gray-600">ayse@workcube.com</p>
               <p className="text-gray-600">Şifre: 123456</p>
             </div>

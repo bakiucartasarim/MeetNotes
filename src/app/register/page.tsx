@@ -79,8 +79,7 @@ export default function RegisterPage() {
           sifre: form.sifre,
           departman: form.departman,
           pozisyon: form.pozisyon,
-          sirketId: form.sirketId === 'yeni' ? null : form.sirketId,
-          yeniSirket: form.sirketId === 'yeni' ? form.yeniSirket : null
+          sirketId: form.sirketId
         }),
       })
 
@@ -113,8 +112,8 @@ export default function RegisterPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Kayıt Ol</h1>
-          <p className="text-gray-600">Toplantı yönetim sistemine katılın</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Çalışan Kaydı</h1>
+          <p className="text-gray-600">Şirketinizin sistemine katılın</p>
         </div>
 
         {/* Register Form */}
@@ -167,9 +166,22 @@ export default function RegisterPage() {
               />
             </div>
 
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center mb-2">
+                <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h4 className="text-sm font-semibold text-blue-800">Önemli Bilgi</h4>
+              </div>
+              <p className="text-sm text-blue-700">
+                Bu sayfa sadece mevcut şirket çalışanları içindir. Şirketiniz henüz sisteme kayıtlı değilse, 
+                önce <Link href="/company-register" className="font-medium underline">şirket kayıt sayfası</Link>ndan şirketinizi kaydetmelisiniz.
+              </p>
+            </div>
+
             <div>
               <label htmlFor="sirketId" className="block text-sm font-medium text-gray-700 mb-2">
-                Şirket *
+                Şirketiniz *
               </label>
               <select
                 id="sirketId"
@@ -185,27 +197,8 @@ export default function RegisterPage() {
                     {company.ad}
                   </option>
                 ))}
-                <option value="yeni">+ Yeni Şirket Ekle</option>
               </select>
             </div>
-
-            {form.sirketId === 'yeni' && (
-              <div>
-                <label htmlFor="yeniSirket" className="block text-sm font-medium text-gray-700 mb-2">
-                  Yeni Şirket Adı *
-                </label>
-                <input
-                  type="text"
-                  id="yeniSirket"
-                  name="yeniSirket"
-                  required
-                  value={form.yeniSirket}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Şirket adını girin"
-                />
-              </div>
-            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -280,21 +273,27 @@ export default function RegisterPage() {
 
             <button
               type="submit"
-              disabled={loading || !form.email.trim() || !form.sifre.trim() || !form.adSoyad.trim()}
+              disabled={loading || !form.email.trim() || !form.sifre.trim() || !form.adSoyad.trim() || !form.sirketId.trim()}
               className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
             >
               {loading && (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               )}
-              <span>{loading ? 'Kayıt Olunuyor...' : 'Kayıt Ol'}</span>
+              <span>{loading ? 'Çalışan Kayıt Ediliyor...' : 'Çalışan Olarak Kayıt Ol'}</span>
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
             <p className="text-sm text-gray-600">
-              Zaten hesabınız var mı?{' '}
+              Şirketinizde zaten hesabınız var mı?{' '}
               <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
                 Giriş Yap
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              Şirketiniz henüz kayıtlı değil mi?{' '}
+              <Link href="/company-register" className="text-green-600 hover:text-green-700 font-medium">
+                Şirket Kaydı Yap
               </Link>
             </p>
           </div>

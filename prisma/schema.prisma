@@ -31,6 +31,7 @@ model Kullanici {
   telefon               String?
   departman             String?
   pozisyon              String?
+  rol                   KullaniciRol            @default(CALISAN)
   sirketId              Int                     @map("sirket_id")
   aktif                 Boolean                 @default(true)
   emailOnaylandi        Boolean                 @default(false) @map("email_onaylandi")
@@ -149,4 +150,9 @@ enum AksiyonOncelik {
   orta
   yuksek
   kritik
+}
+
+enum KullaniciRol {
+  YONETICI
+  CALISAN
 }

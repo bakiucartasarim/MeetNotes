@@ -7,18 +7,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-producti
 
 export async function POST(request: NextRequest) {
   try {
-    const { adSoyad, email, sifre, departman, pozisyon, sirketId, yeniSirket } = await request.json()
+    const { adSoyad, email, sifre, departman, pozisyon, sirketId } = await request.json()
     
-    if (!adSoyad || !email || !sifre) {
+    if (!adSoyad || !email || !sifre || !sirketId) {
       return NextResponse.json(
-        { success: false, error: 'Ad soyad, e-posta ve şifre gerekli' },
-        { status: 400 }
-      )
-    }
-
-    if (!sirketId && !yeniSirket) {
-      return NextResponse.json(
-        { success: false, error: 'Şirket seçimi gerekli' },
+        { success: false, error: 'Ad soyad, e-posta, şifre ve şirket seçimi gerekli' },
         { status: 400 }
       )
     }
@@ -42,23 +35,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Verify company exists
+    const company = await prisma.sirket.findUnique({
+      where: { id: parseInt(sirketId) }
+    })
+
+    if (!company) {
+      return NextResponse.json(
+        { success: false, error: 'Seçilen şirket bulunamadı' },
+        { status: 400 }
+      )
+    }
+
+    if (!company.aktif) {
+      return NextResponse.json(
+        { success: false, error: 'Seçilen şirket aktif değil' },
+        { status: 400 }
+      )
+    }
+
     // Hash password
     const hashedPassword = await bcryptjs.hash(sifre, 12)
 
-    let finalSirketId = sirketId
-
-    // Create new company if needed
-    if (!sirketId && yeniSirket) {
-      const newCompany = await prisma.sirket.create({
-        data: {
-          ad: yeniSirket,
-          aktif: true
-        }
-      })
-      finalSirketId = newCompany.id
-    }
-
-    // Create user
+    // Create user as employee (default role)
     const user = await prisma.kullanici.create({
       data: {
         adSoyad,
@@ -66,9 +65,10 @@ export async function POST(request: NextRequest) {
         sifre: hashedPassword,
         departman: departman || null,
         pozisyon: pozisyon || null,
-        sirketId: parseInt(finalSirketId),
+        rol: 'CALISAN',
+        sirketId: parseInt(sirketId),
         aktif: true,
-        emailOnaylandi: false // In production, send email verification
+        emailOnaylandi: false
       },
       select: {
         id: true,
