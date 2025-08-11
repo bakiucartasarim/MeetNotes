@@ -38,16 +38,42 @@ export default function DashboardPage() {
 
   const fetchDashboardStats = async () => {
     try {
-      // TODO: API endpoint for dashboard stats
-      // Şimdilik mock data
-      setStats({
-        totalEmployees: 8,
-        totalMeetings: 12,
-        pendingActions: 3,
-        overdueActions: 5
+      const response = await fetch('/api/dashboard-stats', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
       })
+      
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success) {
+          setStats(data.data)
+        } else {
+          console.error('API error:', data.error)
+          setStats({
+            totalEmployees: 0,
+            totalMeetings: 0,
+            pendingActions: 0,
+            overdueActions: 0
+          })
+        }
+      } else {
+        console.error('API request failed:', response.status)
+        setStats({
+          totalEmployees: 0,
+          totalMeetings: 0,
+          pendingActions: 0,
+          overdueActions: 0
+        })
+      }
     } catch (error) {
       console.error('Dashboard stats fetch error:', error)
+      setStats({
+        totalEmployees: 0,
+        totalMeetings: 0,
+        pendingActions: 0,
+        overdueActions: 0
+      })
     } finally {
       setLoading(false)
     }
