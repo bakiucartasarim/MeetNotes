@@ -21,6 +21,9 @@ interface ActionResponsible {
   onaylandi: boolean
   onayTarihi: string | null
   yorum: string | null
+  baslangicTarihi: string | null
+  bitisTarihi: string | null
+  durum: string
   kullanici: User
 }
 
@@ -88,7 +91,7 @@ export default function MeetingDetailPage() {
     baslangicTarihi: '',
     bitisTarihi: '',
     oncelik: 'orta' as string,
-    sorumluKisiler: [] as Array<{kullaniciId: number, rol: string}>
+    sorumluKisiler: [] as Array<{kullaniciId: number, rol: string, baslangicTarihi?: string, bitisTarihi?: string, durum?: string}>
   })
 
   const fetchMeetingDetail = useCallback(async () => {
@@ -327,6 +330,38 @@ export default function MeetingDetailPage() {
       }
     } catch (error) {
       console.error('Participant response error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
+  // Kullanıcı bazlı aksiyon güncelleme fonksiyonu
+  const handleUpdateResponsible = async (responsibleId: number, durum: string, baslangicTarihi?: string, bitisTarihi?: string, yorum?: string) => {
+    try {
+      const result = await fetch(`/api/actions/${responsibleId}/update-responsible`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          durum,
+          baslangicTarihi,
+          bitisTarihi,
+          yorum
+        }),
+      })
+
+      const data = await result.json()
+
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        alert('Aksiyon durumu başarıyla güncellendi!')
+      } else {
+        alert(data.error || 'Aksiyon güncellenirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Update responsible error:', error)
       alert('Bağlantı hatası oluştu')
     }
   }
@@ -708,8 +743,33 @@ export default function MeetingDetailPage() {
                                     <div>
                                       <p className="font-medium text-gray-900">{responsible.kullanici.adSoyad}</p>
                                       <p className="text-sm text-gray-500">{responsible.rol}</p>
+                                      
+                                      {/* Kişisel tarih aralığı */}
+                                      {responsible.baslangicTarihi && responsible.bitisTarihi && (
+                                        <div className="flex items-center space-x-1 mt-1">
+                                          <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                          <span className="text-xs text-gray-600">
+                                            {new Date(responsible.baslangicTarihi).toLocaleDateString('tr-TR')} - {new Date(responsible.bitisTarihi).toLocaleDateString('tr-TR')}
+                                          </span>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Durum göstergesi */}
+                                      <div className="flex items-center space-x-2 mt-1">
+                                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                          responsible.durum === 'tamamlandi' ? 'bg-green-100 text-green-800' :
+                                          responsible.durum === 'devam_ediyor' ? 'bg-yellow-100 text-yellow-800' :
+                                          'bg-gray-100 text-gray-600'
+                                        }`}>
+                                          {responsible.durum === 'tamamlandi' ? 'Tamamlandı' :
+                                           responsible.durum === 'devam_ediyor' ? 'Devam Ediyor' : 'Beklemede'}
+                                        </span>
+                                      </div>
+                                      
                                       {responsible.onaylandi && responsible.onayTarihi && (
-                                        <p className="text-xs text-green-600">
+                                        <p className="text-xs text-green-600 mt-1">
                                           ✓ {new Date(responsible.onayTarihi).toLocaleDateString('tr-TR')} tarihinde onaylandı
                                         </p>
                                       )}
@@ -723,6 +783,18 @@ export default function MeetingDetailPage() {
                                       </span>
                                     ) : (
                                       <div className="flex space-x-2">
+                                        {user && (responsible.kullaniciId === user.id || user.rol === 'YONETICI') && (
+                                          <button
+                                            onClick={() => {
+                                              const newStatus = responsible.durum === 'beklemede' ? 'devam_ediyor' : 
+                                                             responsible.durum === 'devam_ediyor' ? 'tamamlandi' : 'beklemede'
+                                              handleUpdateResponsible(responsible.id, newStatus)
+                                            }}
+                                            className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
+                                          >
+                                            Durumu Güncelle
+                                          </button>
+                                        )}
                                         <button
                                           onClick={() => handleApproveAction(action.id, responsible.id, false)}
                                           className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
@@ -739,6 +811,22 @@ export default function MeetingDetailPage() {
                                     )}
                                   </div>
                                 </div>
+                                
+                                {/* Kişisel tarih progress bar */}
+                                {responsible.baslangicTarihi && responsible.bitisTarihi && (
+                                  <div className="mt-3">
+                                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                      <span>Kişisel İlerleme</span>
+                                      <span>{Math.round(getTimeProgressPercentage(responsible.baslangicTarihi, responsible.bitisTarihi))}%</span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                      <div 
+                                        className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                                        style={{ width: `${getTimeProgressPercentage(responsible.baslangicTarihi, responsible.bitisTarihi)}%` }}
+                                      ></div>
+                                    </div>
+                                  </div>
+                                )}
                                 
                                 {responsible.yorum && (
                                   <div className="mt-3 p-3 bg-white rounded border border-gray-200">
@@ -873,39 +961,96 @@ export default function MeetingDetailPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Sorumlu Kişiler
                 </label>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {companyUsers.map((companyUser) => (
-                    <label key={companyUser.id} className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={newAction.sorumluKisiler.some(s => s.kullaniciId === companyUser.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setNewAction({
-                              ...newAction,
-                              sorumluKisiler: [...newAction.sorumluKisiler, {
-                                kullaniciId: companyUser.id,
-                                rol: companyUser.pozisyon || 'Sorumlu'
-                              }]
-                            })
-                          } else {
-                            setNewAction({
-                              ...newAction,
-                              sorumluKisiler: newAction.sorumluKisiler.filter(s => s.kullaniciId !== companyUser.id)
-                            })
-                          }
-                        }}
-                        className="rounded"
-                      />
-                      <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                          {companyUser.adSoyad.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <span className="text-sm">{companyUser.adSoyad}</span>
-                        <span className="text-xs text-gray-500">({companyUser.pozisyon})</span>
+                <div className="space-y-4 max-h-96 overflow-y-auto">
+                  {companyUsers.map((companyUser) => {
+                    const isSelected = newAction.sorumluKisiler.some(s => s.kullaniciId === companyUser.id)
+                    const selectedResponsible = newAction.sorumluKisiler.find(s => s.kullaniciId === companyUser.id)
+                    
+                    return (
+                      <div key={companyUser.id} className="border rounded-lg p-3 space-y-3">
+                        <label className="flex items-center space-x-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setNewAction({
+                                  ...newAction,
+                                  sorumluKisiler: [...newAction.sorumluKisiler, {
+                                    kullaniciId: companyUser.id,
+                                    rol: companyUser.pozisyon || 'Sorumlu',
+                                    baslangicTarihi: newAction.baslangicTarihi,
+                                    bitisTarihi: newAction.bitisTarihi,
+                                    durum: 'beklemede'
+                                  }]
+                                })
+                              } else {
+                                setNewAction({
+                                  ...newAction,
+                                  sorumluKisiler: newAction.sorumluKisiler.filter(s => s.kullaniciId !== companyUser.id)
+                                })
+                              }
+                            }}
+                            className="rounded"
+                          />
+                          <div className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                              {companyUser.adSoyad.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium">{companyUser.adSoyad}</span>
+                              <span className="text-xs text-gray-500 ml-2">({companyUser.pozisyon})</span>
+                            </div>
+                          </div>
+                        </label>
+                        
+                        {isSelected && (
+                          <div className="ml-8 grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Kişisel Başlangıç Tarihi
+                              </label>
+                              <input
+                                type="date"
+                                value={selectedResponsible?.baslangicTarihi || ''}
+                                onChange={(e) => {
+                                  setNewAction({
+                                    ...newAction,
+                                    sorumluKisiler: newAction.sorumluKisiler.map(s => 
+                                      s.kullaniciId === companyUser.id 
+                                        ? { ...s, baslangicTarihi: e.target.value }
+                                        : s
+                                    )
+                                  })
+                                }}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-gray-600 mb-1">
+                                Kişisel Bitiş Tarihi
+                              </label>
+                              <input
+                                type="date"
+                                value={selectedResponsible?.bitisTarihi || ''}
+                                onChange={(e) => {
+                                  setNewAction({
+                                    ...newAction,
+                                    sorumluKisiler: newAction.sorumluKisiler.map(s => 
+                                      s.kullaniciId === companyUser.id 
+                                        ? { ...s, bitisTarihi: e.target.value }
+                                        : s
+                                    )
+                                  })
+                                }}
+                                className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </label>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>

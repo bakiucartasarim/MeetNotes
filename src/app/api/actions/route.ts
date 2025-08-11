@@ -56,10 +56,19 @@ export async function POST(request: NextRequest) {
     // Sorumlu kişileri ekle
     if (data.sorumluKisiler && data.sorumluKisiler.length > 0) {
       await prisma.aksiyonSorumluKisi.createMany({
-        data: data.sorumluKisiler.map((sorumlu: {kullaniciId: string, rol?: string}) => ({
+        data: data.sorumluKisiler.map((sorumlu: {
+          kullaniciId: string, 
+          rol?: string,
+          baslangicTarihi?: string,
+          bitisTarihi?: string,
+          durum?: string
+        }) => ({
           aksiyonId: action.id,
           kullaniciId: parseInt(sorumlu.kullaniciId),
-          rol: sorumlu.rol || 'Sorumlu'
+          rol: sorumlu.rol || 'Sorumlu',
+          baslangicTarihi: sorumlu.baslangicTarihi ? new Date(sorumlu.baslangicTarihi) : null,
+          bitisTarihi: sorumlu.bitisTarihi ? new Date(sorumlu.bitisTarihi) : null,
+          durum: sorumlu.durum || 'beklemede'
         }))
       })
     }

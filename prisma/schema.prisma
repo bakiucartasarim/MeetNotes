@@ -108,13 +108,16 @@ model ToplantiAksiyon {
 }
 
 model AksiyonSorumluKisi {
-  id           Int           @id @default(autoincrement())
-  aksiyonId    Int           @map("aksiyon_id")
-  kullaniciId  Int           @map("kullanici_id")
-  rol          String
-  onaylandi    Boolean       @default(false)
-  onayTarihi   DateTime?     @map("onay_tarihi")
-  yorum        String?
+  id              Int           @id @default(autoincrement())
+  aksiyonId       Int           @map("aksiyon_id")
+  kullaniciId     Int           @map("kullanici_id")
+  rol             String
+  onaylandi       Boolean       @default(false)
+  onayTarihi      DateTime?     @map("onay_tarihi")
+  yorum           String?
+  baslangicTarihi DateTime?     @map("baslangic_tarihi") @db.Date
+  bitisTarihi     DateTime?     @map("bitis_tarihi") @db.Date
+  durum           AksiyonDurum  @default(beklemede)
 
   // Relations
   aksiyon      ToplantiAksiyon @relation(fields: [aksiyonId], references: [id], onDelete: Cascade)
