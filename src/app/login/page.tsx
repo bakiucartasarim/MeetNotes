@@ -176,15 +176,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Demo Accounts */}
-        <div className="mt-6 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-sm font-medium text-gray-900 mb-3">Demo Hesaplar</h3>
-          <div className="space-y-2 text-xs text-gray-600">
-            <p><strong>Proje Yöneticisi:</strong> ahmet@workcube.com | 123456</p>
-            <p><strong>Developer:</strong> fatma@workcube.com | 123456</p>
-            <p><strong>QA Engineer:</strong> ayse@workcube.com | 123456</p>
-          </div>
-        </div>
       </div>
     </div>
   )

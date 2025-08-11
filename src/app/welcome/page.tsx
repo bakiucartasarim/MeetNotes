@@ -1,13 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function WelcomePage() {
   const { isAuthenticated, loading: authLoading } = useAuth()
-  const [users, setUsers] = useState([])
-  const [loading, setLoading] = useState(true)
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
@@ -15,24 +13,6 @@ export default function WelcomePage() {
       window.location.href = '/meetings'
     }
   }, [isAuthenticated, authLoading])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch('/api/demo-users')
-      const data = await response.json()
-      if (data.success) {
-        setUsers(data.data)
-      }
-    } catch (error) {
-      console.error('Users fetch error:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   // Show loading state while checking authentication
   if (authLoading) {
@@ -223,32 +203,6 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Users Section */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">API Test - Sistem Kullanıcıları</h3>
-            <p className="text-sm text-gray-500">Bağlantı durumu: ✅ Başarılı - {users.length} kullanıcı</p>
-          </div>
-          
-          {loading ? (
-            <div className="p-6 text-center text-gray-500">Yükleniyor...</div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {users.map((user: {id: number, adSoyad: string, pozisyon: string, departman: string, email: string}) => (
-                <div key={user.id} className="px-6 py-4 flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
-                    {user.adSoyad.split(' ').map((n: string) => n[0]).join('')}
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-sm font-medium text-gray-900">{user.adSoyad}</div>
-                    <div className="text-sm text-gray-500">{user.pozisyon} • {user.departman}</div>
-                  </div>
-                  <div className="text-sm text-gray-400">{user.email}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
         {/* Tech Stack */}
         <div className="mt-16 text-center">
