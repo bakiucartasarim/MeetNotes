@@ -51,6 +51,9 @@ interface Meeting {
   katilimcilar: Array<{
     id: number
     katilimDurumu: string
+    davetTarihi: string
+    cevapTarihi: string | null
+    notlar: string | null
     kullanici: User
   }>
   aksiyonlar: Action[]
@@ -298,6 +301,36 @@ export default function MeetingDetailPage() {
     }
   }
 
+  // Katılımcı yanıtı güncelleme fonksiyonu
+  const handleParticipantResponse = async (participantId: number, response: string) => {
+    try {
+      const result = await fetch(`/api/meetings/${meeting.id}/participant-response`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          participantId,
+          response
+        }),
+      })
+
+      const data = await result.json()
+
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        alert('Yanıt başarıyla kaydedildi!')
+      } else {
+        alert(data.error || 'Yanıt kaydedilirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Participant response error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
   // Mevcut katılımcı olmayan kullanıcıları filtrele
   const availableUsers = companyUsers.filter(user => 
     !meeting?.katilimcilar.some(p => p.kullanici.id === user.id)
@@ -486,28 +519,95 @@ export default function MeetingDetailPage() {
                 )}
               </div>
               <div className="p-6">
-                <div className="space-y-3">
-                  {meeting.katilimcilar.map((participant) => (
-                    <div key={participant.id} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
-                          {participant.kullanici.adSoyad.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{participant.kullanici.adSoyad}</p>
-                          <p className="text-xs text-gray-500">{participant.kullanici.pozisyon}</p>
+                <div className="space-y-4">
+                  {meeting.katilimcilar.map((participant) => {
+                    const canRespond = user && (participant.kullanici.id === user.id || user.rol === 'YONETICI' || meeting.olusturan.id === user.id)
+                    return (
+                      <div key={participant.id} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium">
+                              {participant.kullanici.adSoyad.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">{participant.kullanici.adSoyad}</p>
+                              <p className="text-xs text-gray-500">{participant.kullanici.pozisyon} • {participant.kullanici.departman}</p>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <span className="text-xs text-gray-400">Davet:</span>
+                                <span className="text-xs text-gray-600">
+                                  {new Date(participant.davetTarihi).toLocaleDateString('tr-TR', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                              {participant.cevapTarihi && (
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <span className="text-xs text-gray-400">Yanıt:</span>
+                                  <span className="text-xs text-gray-600">
+                                    {new Date(participant.cevapTarihi).toLocaleDateString('tr-TR', {
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      year: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                              {participant.notlar && (
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
+                                    {participant.notlar}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col items-end space-y-2">
+                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                              participant.katilimDurumu === 'kabul' ? 'bg-green-100 text-green-800' :
+                              participant.katilimDurumu === 'red' ? 'bg-red-100 text-red-800' :
+                              'bg-yellow-100 text-yellow-800'
+                            }`}>
+                              {participant.katilimDurumu === 'kabul' ? '✓ Kabul' :
+                               participant.katilimDurumu === 'red' ? '✗ Red' : '⏳ Beklemede'}
+                            </span>
+                            
+                            {canRespond && participant.katilimDurumu === 'beklemede' && (
+                              <div className="flex space-x-1">
+                                <button
+                                  onClick={() => handleParticipantResponse(participant.id, 'kabul')}
+                                  className="px-2 py-1 bg-green-500 hover:bg-green-600 text-white text-xs rounded-md transition-colors"
+                                  title="Kabul Et"
+                                >
+                                  ✓
+                                </button>
+                                <button
+                                  onClick={() => handleParticipantResponse(participant.id, 'red')}
+                                  className="px-2 py-1 bg-red-500 hover:bg-red-600 text-white text-xs rounded-md transition-colors"
+                                  title="Reddet"
+                                >
+                                  ✗
+                                </button>
+                                <button
+                                  onClick={() => handleParticipantResponse(participant.id, 'ek_sure')}
+                                  className="px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded-md transition-colors"
+                                  title="Ek Süre İste"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        participant.katilimDurumu === 'kabul' ? 'bg-green-100 text-green-800' :
-                        participant.katilimDurumu === 'red' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {participant.katilimDurumu === 'kabul' ? 'Kabul' :
-                         participant.katilimDurumu === 'red' ? 'Red' : 'Beklemede'}
-                      </span>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>
