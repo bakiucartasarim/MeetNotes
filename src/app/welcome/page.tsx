@@ -140,35 +140,6 @@ export default function WelcomePage() {
           </div>
         </div>
 
-        {/* Demo Login */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-16 text-center">
-          <div className="flex items-center justify-center mb-3">
-            <svg className="w-6 h-6 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h3 className="text-lg font-semibold text-yellow-800">Demo Hesaplar Mevcut</h3>
-          </div>
-          <p className="text-sm text-yellow-700 mb-4">
-            Sistemi test etmek için demo şirket hesaplarıyla giriş yapabilirsiniz
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Şirket Yöneticisi</p>
-              <p className="text-gray-600">ahmet@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Çalışan</p>
-              <p className="text-gray-600">fatma@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-            <div className="bg-white p-3 rounded-lg border border-yellow-200">
-              <p className="font-medium text-gray-900">Çalışan</p>
-              <p className="text-gray-600">ayse@workcube.com</p>
-              <p className="text-gray-600">Şifre: 123456</p>
-            </div>
-          </div>
-        </div>
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
