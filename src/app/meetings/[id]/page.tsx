@@ -25,6 +25,15 @@ interface ActionResponsible {
   bitisTarihi: string | null
   durum: string
   kullanici: User
+  ekSureTalepleri?: Array<{
+    id: number
+    yeniTarih: string
+    talepYorumu: string | null
+    durum: string
+    talepTarihi: string
+    cevapTarihi: string | null
+    cevapYorumu: string | null
+  }>
 }
 
 interface Action {
@@ -76,6 +85,11 @@ export default function MeetingDetailPage() {
   const [comment, setComment] = useState('')
   const [addParticipantModal, setAddParticipantModal] = useState(false)
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+  const [extensionModal, setExtensionModal] = useState<{responsibleId: number, currentEndDate: string} | null>(null)
+  const [extensionRequest, setExtensionRequest] = useState({
+    yeniTarih: '',
+    yorum: ''
+  })
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -364,6 +378,102 @@ export default function MeetingDetailPage() {
       }
     } catch (error) {
       console.error('Update responsible error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
+  // Ek süre talep etme fonksiyonu
+  const handleRequestExtension = async () => {
+    if (!extensionModal || !extensionRequest.yeniTarih) return
+
+    try {
+      const result = await fetch(`/api/actions/${extensionModal.responsibleId}/request-extension`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(extensionRequest),
+      })
+
+      const data = await result.json()
+
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        setExtensionModal(null)
+        setExtensionRequest({ yeniTarih: '', yorum: '' })
+        alert('Ek süre talebi başarıyla gönderildi!')
+      } else {
+        alert(data.error || 'Ek süre talebi gönderilirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Extension request error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
+  // Aksiyonu tamamlama fonksiyonu
+  const handleCompleteAction = async (responsibleId: number) => {
+    try {
+      const result = await fetch(`/api/actions/${responsibleId}/update-responsible`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          durum: 'tamamlandi'
+        }),
+      })
+
+      const data = await result.json()
+
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        alert('Aksiyon tamamlandı olarak işaretlendi!')
+      } else {
+        alert(data.error || 'Aksiyon güncellenirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Complete action error:', error)
+      alert('Bağlantı hatası oluştu')
+    }
+  }
+
+  // Ek süre talep onay fonksiyonu
+  const handleApproveExtensionRequest = async (extensionRequestId: number, approved: boolean) => {
+    const cevapYorumu = prompt(approved ? 'Onay yorumunuz (isteğe bağlı):' : 'Red gerekçenizi belirtin:')
+    if (!approved && !cevapYorumu) {
+      alert('Red gerekçesi belirtmelisiniz.')
+      return
+    }
+
+    try {
+      const result = await fetch(`/api/actions/extension-requests/${extensionRequestId}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          approved,
+          cevapYorumu
+        }),
+      })
+
+      const data = await result.json()
+
+      if (data.success) {
+        // Toplantı detayını yenile
+        fetchMeetingDetail()
+        alert(data.message)
+      } else {
+        alert(data.error || 'İşlem gerçekleştirilirken hata oluştu')
+      }
+    } catch (error) {
+      console.error('Extension request approval error:', error)
       alert('Bağlantı hatası oluştu')
     }
   }
@@ -784,31 +894,45 @@ export default function MeetingDetailPage() {
                                         ✓ Onaylandı
                                       </span>
                                     ) : (
-                                      <div className="flex space-x-2">
-                                        {user && (responsible.kullaniciId === user.id || user.rol === 'YONETICI') && (
-                                          <button
-                                            onClick={() => {
-                                              const newStatus = responsible.durum === 'beklemede' ? 'devam_ediyor' : 
-                                                             responsible.durum === 'devam_ediyor' ? 'tamamlandi' : 'beklemede'
-                                              handleUpdateResponsible(responsible.id, newStatus)
-                                            }}
-                                            className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors"
-                                          >
-                                            Durumu Güncelle
-                                          </button>
+                                      <div className="flex flex-wrap gap-1">
+                                        {/* Kullanıcının kendi aksiyonu için butonlar */}
+                                        {user && responsible.kullaniciId === user.id && (
+                                          <>
+                                            <button
+                                              onClick={() => handleCompleteAction(responsible.id)}
+                                              className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
+                                            >
+                                              ✓ Onayla
+                                            </button>
+                                            <button
+                                              onClick={() => setExtensionModal({
+                                                responsibleId: responsible.id,
+                                                currentEndDate: responsible.bitisTarihi || ''
+                                              })}
+                                              className="px-2 py-1 rounded text-xs font-medium bg-orange-100 text-orange-800 hover:bg-orange-200 transition-colors"
+                                            >
+                                              ⏰ Ek Süre İste
+                                            </button>
+                                          </>
                                         )}
-                                        <button
-                                          onClick={() => handleApproveAction(action.id, responsible.id, false)}
-                                          className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
-                                        >
-                                          ✗ Reddet
-                                        </button>
-                                        <button
-                                          onClick={() => setCommentModal({ actionId: action.id, responsibleId: responsible.id })}
-                                          className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
-                                        >
-                                          ✓ Onayla
-                                        </button>
+                                        
+                                        {/* Toplantı yöneticisi veya yönetici için butonlar */}
+                                        {user && (user.rol === 'YONETICI' || meeting?.olusturan.id === user.id) && responsible.kullaniciId !== user.id && (
+                                          <>
+                                            <button
+                                              onClick={() => handleApproveAction(action.id, responsible.id, false)}
+                                              className="px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
+                                            >
+                                              ✗ Reddet
+                                            </button>
+                                            <button
+                                              onClick={() => setCommentModal({ actionId: action.id, responsibleId: responsible.id })}
+                                              className="px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
+                                            >
+                                              ✓ Yönetici Onayı
+                                            </button>
+                                          </>
+                                        )}
                                       </div>
                                     )}
                                   </div>
@@ -835,6 +959,65 @@ export default function MeetingDetailPage() {
                                     <p className="text-sm text-gray-600">
                                       <span className="font-medium">Yorum:</span> {responsible.yorum}
                                     </p>
+                                  </div>
+                                )}
+
+                                {/* Ek Süre Talepleri */}
+                                {responsible.ekSureTalepleri && responsible.ekSureTalepleri.length > 0 && (
+                                  <div className="mt-3 space-y-2">
+                                    <h5 className="text-xs font-medium text-gray-700">Ek Süre Talepleri:</h5>
+                                    {responsible.ekSureTalepleri.map((talep) => (
+                                      <div key={talep.id} className="p-2 bg-orange-50 rounded border border-orange-200">
+                                        <div className="flex items-start justify-between">
+                                          <div className="flex-1">
+                                            <div className="flex items-center space-x-2 mb-1">
+                                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                talep.durum === 'kabul' ? 'bg-green-100 text-green-800' :
+                                                talep.durum === 'red' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                              }`}>
+                                                {talep.durum === 'kabul' ? '✓ Kabul' :
+                                                 talep.durum === 'red' ? '✗ Red' : '⏳ Beklemede'}
+                                              </span>
+                                              <span className="text-xs text-gray-500">
+                                                {new Date(talep.talepTarihi).toLocaleDateString('tr-TR')}
+                                              </span>
+                                            </div>
+                                            <p className="text-xs text-gray-600">
+                                              <span className="font-medium">Yeni Tarih:</span> {new Date(talep.yeniTarih).toLocaleDateString('tr-TR')}
+                                            </p>
+                                            {talep.talepYorumu && (
+                                              <p className="text-xs text-gray-600 mt-1">
+                                                <span className="font-medium">Gerekçe:</span> {talep.talepYorumu}
+                                              </p>
+                                            )}
+                                            {talep.cevapYorumu && (
+                                              <p className="text-xs text-gray-600 mt-1">
+                                                <span className="font-medium">Cevap:</span> {talep.cevapYorumu}
+                                              </p>
+                                            )}
+                                          </div>
+                                          
+                                          {/* Toplantı yöneticisi onay butonları */}
+                                          {talep.durum === 'beklemede' && user && (user.rol === 'YONETICI' || meeting?.olusturan.id === user.id) && (
+                                            <div className="flex space-x-1 ml-2">
+                                              <button
+                                                onClick={() => handleApproveExtensionRequest(talep.id, false)}
+                                                className="px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 hover:bg-red-200 transition-colors"
+                                              >
+                                                ✗
+                                              </button>
+                                              <button
+                                                onClick={() => handleApproveExtensionRequest(talep.id, true)}
+                                                className="px-1.5 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 hover:bg-green-200 transition-colors"
+                                              >
+                                                ✓
+                                              </button>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </div>
+                                    ))}
                                   </div>
                                 )}
                               </div>
@@ -1156,6 +1339,74 @@ export default function MeetingDetailPage() {
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg transition-colors"
               >
                 Katılımcı Ekle
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Extension Request Modal */}
+      {extensionModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Ek Süre Talebi</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mevcut Bitiş Tarihi
+                </label>
+                <input
+                  type="text"
+                  value={extensionModal.currentEndDate ? new Date(extensionModal.currentEndDate).toLocaleDateString('tr-TR') : 'Belirtilmemiş'}
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Yeni Bitiş Tarihi *
+                </label>
+                <input
+                  type="date"
+                  value={extensionRequest.yeniTarih}
+                  onChange={(e) => setExtensionRequest({...extensionRequest, yeniTarih: e.target.value})}
+                  min={extensionModal.currentEndDate || new Date().toISOString().split('T')[0]}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Talep Gerekçesi
+                </label>
+                <textarea
+                  value={extensionRequest.yorum}
+                  onChange={(e) => setExtensionRequest({...extensionRequest, yorum: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows={3}
+                  placeholder="Neden ek süreye ihtiyaç duyuyorsunuz?"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setExtensionModal(null)
+                  setExtensionRequest({ yeniTarih: '', yorum: '' })
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors"
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleRequestExtension}
+                disabled={!extensionRequest.yeniTarih}
+                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+              >
+                Talep Gönder
               </button>
             </div>
           </div>

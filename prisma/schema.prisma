@@ -44,6 +44,8 @@ model Kullanici {
   olusturduguToplantilar Toplanti[]            @relation("ToplantiOlusturan")
   katilimlar            ToplantiKatilimci[]
   sorumluOlduguAksiyonlar AksiyonSorumluKisi[]
+  talepEttigiEkSureler  AksiyonEkSureTalebi[]  @relation("EkSureTalepEden")
+  cevapVerdigiEkSureler AksiyonEkSureTalebi[]  @relation("EkSureTalepCevapVeren")
 
   @@map("kullanicilar")
 }
@@ -122,8 +124,29 @@ model AksiyonSorumluKisi {
   // Relations
   aksiyon      ToplantiAksiyon @relation(fields: [aksiyonId], references: [id], onDelete: Cascade)
   kullanici    Kullanici       @relation(fields: [kullaniciId], references: [id], onDelete: Cascade)
+  ekSureTalepleri AksiyonEkSureTalebi[]
 
   @@map("aksiyon_sorumlu_kişiler")
+}
+
+model AksiyonEkSureTalebi {
+  id                    Int                   @id @default(autoincrement())
+  aksiyonSorumluKisiId  Int                   @map("aksiyon_sorumlu_kisi_id")
+  talepEdenId           Int                   @map("talep_eden_id")
+  yeniTarih             DateTime              @map("yeni_tarih") @db.Date
+  talepYorumu           String?               @map("talep_yorumu")
+  durum                 EkSureTalepDurum      @default(beklemede)
+  cevapYorumu           String?               @map("cevap_yorumu")
+  talepTarihi           DateTime              @default(now()) @map("talep_tarihi")
+  cevapTarihi           DateTime?             @map("cevap_tarihi")
+  cevapVerenId          Int?                  @map("cevap_veren_id")
+
+  // Relations
+  aksiyonSorumluKisi    AksiyonSorumluKisi    @relation(fields: [aksiyonSorumluKisiId], references: [id], onDelete: Cascade)
+  talepEden             Kullanici             @relation("EkSureTalepEden", fields: [talepEdenId], references: [id], onDelete: Cascade)
+  cevapVeren            Kullanici?            @relation("EkSureTalepCevapVeren", fields: [cevapVerenId], references: [id], onDelete: SetNull)
+
+  @@map("aksiyon_ek_sure_talepleri")
 }
 
 // Enums
@@ -158,4 +181,10 @@ enum AksiyonOncelik {
 enum KullaniciRol {
   YONETICI
   CALISAN
+}
+
+enum EkSureTalepDurum {
+  beklemede
+  kabul
+  red
 }

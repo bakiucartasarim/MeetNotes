@@ -84,6 +84,25 @@ export async function GET(
                     departman: true, 
                     pozisyon: true 
                   }
+                },
+                ekSureTalepleri: {
+                  include: {
+                    talepEden: {
+                      select: {
+                        id: true,
+                        adSoyad: true,
+                        email: true
+                      }
+                    },
+                    cevapVeren: {
+                      select: {
+                        id: true,
+                        adSoyad: true,
+                        email: true
+                      }
+                    }
+                  },
+                  orderBy: { talepTarihi: 'desc' }
                 }
               }
             }
