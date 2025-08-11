@@ -306,6 +306,8 @@ export default function MeetingDetailPage() {
 
   // Katılımcı yanıtı güncelleme fonksiyonu
   const handleParticipantResponse = async (participantId: number, response: string) => {
+    if (!meeting) return
+    
     try {
       const result = await fetch(`/api/meetings/${meeting.id}/participant-response`, {
         method: 'POST',
