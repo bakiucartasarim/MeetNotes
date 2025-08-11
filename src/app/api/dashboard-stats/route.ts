@@ -58,11 +58,11 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    // Bekleyen aksiyon onayları (tamamlandi durumu)
+    // Bekleyen aksiyon onayları (tamamlandi durumu ama henüz onaylanmamış)
     const pendingActionApprovals = await prisma.aksiyonSorumluKisi.count({
       where: {
         durum: 'tamamlandi',
-        onayDurumu: 'beklemede',
+        onaylandi: false,
         aksiyon: {
           toplanti: {
             sirketId: currentUser.sirketId,
