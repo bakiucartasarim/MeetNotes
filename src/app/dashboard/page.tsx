@@ -11,7 +11,8 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({
     totalEmployees: 0,
     totalMeetings: 0,
-    pendingActions: 0
+    pendingActions: 0,
+    overdueActions: 0
   })
   const [loading, setLoading] = useState(true)
 
@@ -42,7 +43,8 @@ export default function DashboardPage() {
       setStats({
         totalEmployees: 8,
         totalMeetings: 12,
-        pendingActions: 3
+        pendingActions: 3,
+        overdueActions: 5
       })
     } catch (error) {
       console.error('Dashboard stats fetch error:', error)
@@ -127,7 +129,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -166,6 +168,20 @@ export default function DashboardPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-500">Bekleyen Onay</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.pendingActions}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Geciken Aksiyon</p>
+                <p className="text-2xl font-bold text-red-600">{stats.overdueActions}</p>
               </div>
             </div>
           </div>
@@ -273,6 +289,28 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <p className="text-xs text-gray-500">Bekleyen onay işlemleri</p>
+                </div>
+              </Link>
+
+              <Link 
+                href="/overdue-actions" 
+                className="flex items-center p-3 rounded-lg border border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all group"
+              >
+                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="ml-3 flex-1">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-medium text-gray-900">Geciken Aksiyonlar</h4>
+                    {stats.overdueActions > 0 && (
+                      <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                        {stats.overdueActions}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">Tarihi geçen aksiyonlar</p>
                 </div>
               </Link>
             </div>
